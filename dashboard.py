@@ -3,10 +3,14 @@ Ministry of Labour - Fee Strategy & Revenue Optimizer Dashboard
 
 A comprehensive Streamlit dashboard for analyzing service fees and simulating revenue scenarios.
 """
+import os
+from dotenv import load_dotenv
+
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from utils.data_loader import prepare_dashboard_data
+from utils.ai_assistant import load_ai_assistant
 from utils.analytics import (
     calculate_revenue_impact,
     identify_top_opportunities,
@@ -138,6 +142,21 @@ def show_scenario_banner(scenario, original_summary):
 def main():
     """Main dashboard application."""
     
+    # Load environment variables
+    load_dotenv()
+    
+    # Initialize AI Assistant
+    if 'ai_assistant' not in st.session_state:
+        st.session_state.ai_assistant = load_ai_assistant()
+    
+    # Initialize language preference
+    if 'language' not in st.session_state:
+        st.session_state.language = "en"
+    
+    # Initialize chat history
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
+    
     # Header
     st.title("🏛️ Ministry of Labour - Fee Strategy & Revenue Optimizer")
     st.markdown("**Comprehensive Decision Support System for Service Fee Management**")
@@ -158,6 +177,95 @@ def main():
         st.error(f"Error loading data: {e}")
         st.info("Please ensure Book1.xlsx is in the same directory as this script.")
         return
+    
+    # Sidebar - AI Chat Assistant
+    st.sidebar.title("🤖 AI Assistant")
+    
+    # Check if AI is available
+    ai = st.session_state.ai_assistant
+    
+    if ai and ai.is_available():
+        # Language toggle
+        col1, col2 = st.sidebar.columns(2)
+        with col1:
+            if st.button("🇬🇧 English", use_container_width=True, 
+                        type="primary" if st.session_state.language == "en" else "secondary"):
+                st.session_state.language = "en"
+                st.rerun()
+        with col2:
+            if st.button("🇸🇦 العربية", use_container_width=True,
+                        type="primary" if st.session_state.language == "ar" else "secondary"):
+                st.session_state.language = "ar"
+                st.rerun()
+        
+        st.sidebar.markdown("---")
+        
+        # Chat history display
+        st.sidebar.markdown("### 💬 Chat")
+        
+        # Chat container with fixed height
+        chat_container = st.sidebar.container(height=300)
+        
+        with chat_container:
+            for msg in st.session_state.chat_history:
+                if msg["role"] == "user":
+                    st.markdown(f"**You:** {msg['content']}")
+                else:
+                    st.markdown(f"**AI:** {msg['content']}")
+                st.markdown("---")
+        
+        # Clear history button
+        if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.chat_history = []
+            st.rerun()
+        
+        # Chat input
+        user_message = st.sidebar.text_input(
+            "Ask me anything about the data...",
+            key="chat_input",
+            placeholder="e.g., Which services should I prioritize?"
+        )
+        
+        if user_message:
+            # Build context
+            context = {
+                "page": page if 'page' in locals() else "Dashboard",
+                "total_services": summary['total_services'],
+                "total_requests": summary['total_requests'],
+                "services_without_fees": summary['services_without_fees'],
+                "current_revenue": summary['current_total_revenue'],
+                "scenario_name": st.session_state.active_scenario['name'] if is_scenario_active else "None"
+            }
+            
+            # Get AI response
+            with st.sidebar.spinner("🤔 Thinking..."):
+                response = ai.chat(
+                    user_message,
+                    context=context,
+                    language=st.session_state.language,
+                    chat_history=st.session_state.chat_history
+                )
+            
+            # Add to history
+            st.session_state.chat_history.append({"role": "user", "content": user_message})
+            st.session_state.chat_history.append({"role": "assistant", "content": response})
+            
+            # Limit history to last 20 messages
+            if len(st.session_state.chat_history) > 20:
+                st.session_state.chat_history = st.session_state.chat_history[-20:]
+            
+            st.rerun()
+        
+        # Cost summary
+        costs = ai.get_cost_summary()
+        if costs['requests'] > 0:
+            st.sidebar.markdown("---")
+            st.sidebar.caption(f"💰 Session: ${costs['estimated_cost']:.3f} | {costs['requests']} requests")
+    
+    else:
+        st.sidebar.info("🤖 AI Assistant unavailable. Configure API keys in .env file.")
+    
+    st.sidebar.markdown("---")
     
     # Sidebar navigation
     st.sidebar.title("📊 Navigation")
@@ -225,6 +333,38 @@ def main():
             )
         
         st.markdown("---")
+        
+        # AI Insights Section
+        if ai and ai.is_available():
+            st.subheader("🤖 AI Strategic Insights")
+            
+            with st.spinner("🤔 Analyzing data..."):
+                # Prepare data for insights
+                top_service = df.nlargest(1, 'اجمالي العدد').iloc[0]
+                insight_data = {
+                    "total_services": summary['total_services'],
+                    "total_requests": summary['total_requests'],
+                    "services_without_fees": summary['services_without_fees'],
+                    "no_fee_pct": (summary['services_without_fees'] / summary['total_services'] * 100),
+                    "current_revenue": summary['current_total_revenue'],
+                    "top_service": top_service['اسم الخدمة'],
+                    "top_requests": int(top_service['اجمالي العدد'])
+                }
+                
+                # Generate insights
+                insights = ai.generate_insights(
+                    insight_data,
+                    insight_type="executive_summary",
+                    language=st.session_state.language
+                )
+                
+                # Display in nice box
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            padding: 20px; border-radius: 10px; color: white; margin-bottom: 20px;">
+                    {insights.replace(chr(10), '<br>')}
+                </div>
+                """, unsafe_allow_html=True)
         
         # Key Insights
         col1, col2 = st.columns(2)
@@ -525,6 +665,34 @@ def main():
             opportunities = identify_top_opportunities(df, suggested_fee, top_n)
             
             st.plotly_chart(plot_opportunities_chart(opportunities), use_container_width=True)
+        
+        # AI Insights for Opportunities
+        if ai and ai.is_available():
+            st.subheader("🤖 AI Strategic Analysis")
+            
+            with st.spinner("🤔 Analyzing opportunities..."):
+                # Prepare opportunities data
+                opps_summary = []
+                for _, row in opportunities.head(5).iterrows():
+                    opps_summary.append(
+                        f"- {row['اسم الخدمة']}: {int(row['اجمالي العدد']):,} requests → {row['Revenue_Gain']:,.0f} QAR potential"
+                    )
+                
+                insight_data = {
+                    "opportunities_data": "\n".join(opps_summary),
+                    "suggested_fee": suggested_fee,
+                    "total_potential": opportunities['Revenue_Gain'].sum()
+                }
+                
+                # Generate insights
+                insights = ai.generate_insights(
+                    insight_data,
+                    insight_type="opportunities",
+                    language=st.session_state.language
+                )
+                
+                # Display in info box
+                st.info(insights)
         
         st.subheader("📋 Detailed Opportunities")
         
