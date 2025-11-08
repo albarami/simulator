@@ -390,10 +390,17 @@ def main():
         
         with col2:
             st.subheader("💡 Quick Actions")
-            if st.button("🔍 Find Top Revenue Opportunities", use_container_width=True):
-                st.switch_page
-            st.button("🎯 Create Revenue Scenario", use_container_width=True)
-            st.button("📊 View Detailed Analytics", use_container_width=True)
+            st.info("""
+            **Navigate to sections using the sidebar:**
+            
+            🔍 Top Opportunities - Find quick wins
+            
+            🎯 Revenue Simulator - Test scenarios
+            
+            📊 Trend Analysis - View forecasts
+            
+            🎭 Scenario Planning - Create strategies
+            """)
         
         # Charts
         st.markdown("---")
