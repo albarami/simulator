@@ -227,14 +227,21 @@ def main():
         )
         
         if user_message:
-            # Build context
+            # Build context with actual data
+            top_services = df.nlargest(10, 'اجمالي العدد')[['اسم الخدمة', 'اجمالي العدد', 'Current_Fee_Numeric']].to_dict('records')
+            top_services_text = "\n".join([
+                f"- {s['اسم الخدمة']}: {int(s['اجمالي العدد']):,} requests, {s['Current_Fee_Numeric']} QAR fee" 
+                for s in top_services
+            ])
+            
             context = {
                 "page": page if 'page' in locals() else "Dashboard",
                 "total_services": summary['total_services'],
                 "total_requests": summary['total_requests'],
                 "services_without_fees": summary['services_without_fees'],
                 "current_revenue": summary['current_total_revenue'],
-                "scenario_name": st.session_state.active_scenario['name'] if is_scenario_active else "None"
+                "scenario_name": st.session_state.active_scenario['name'] if is_scenario_active else "None",
+                "top_10_services": top_services_text
             }
             
             # Get AI response
