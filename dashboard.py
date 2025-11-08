@@ -203,16 +203,15 @@ def main():
         # Chat history display
         st.sidebar.markdown("### 💬 Chat")
         
-        # Chat container with fixed height
-        chat_container = st.sidebar.container(height=300)
+        # Display last 5 messages only for better performance
+        recent_messages = st.session_state.chat_history[-10:] if len(st.session_state.chat_history) > 10 else st.session_state.chat_history
         
-        with chat_container:
-            for msg in st.session_state.chat_history:
-                if msg["role"] == "user":
-                    st.markdown(f"**You:** {msg['content']}")
-                else:
-                    st.markdown(f"**AI:** {msg['content']}")
-                st.markdown("---")
+        for msg in recent_messages:
+            if msg["role"] == "user":
+                st.sidebar.markdown(f"**You:** {msg['content']}")
+            else:
+                st.sidebar.markdown(f"**AI:** {msg['content']}")
+            st.sidebar.markdown("---")
         
         # Clear history button
         if st.sidebar.button("🗑️ Clear Chat", use_container_width=True):
