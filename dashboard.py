@@ -219,14 +219,13 @@ def main():
             st.session_state.chat_history = []
             st.rerun()
         
-        # Chat input
-        user_message = st.sidebar.text_input(
-            "Ask me anything about the data...",
-            key="chat_input",
-            placeholder="e.g., Which services should I prioritize?"
+        # Chat input using chat_input (auto-clears after send)
+        user_message = st.sidebar.chat_input(
+            "Ask me anything...",
+            key="chat_input"
         )
         
-        if user_message:
+        if user_message and user_message.strip():
             # Build context with actual data
             top_services = df.nlargest(10, 'اجمالي العدد')[['اسم الخدمة', 'اجمالي العدد', 'Current_Fee_Numeric']].to_dict('records')
             top_services_text = "\n".join([
