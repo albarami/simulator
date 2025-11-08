@@ -238,7 +238,7 @@ def main():
             }
             
             # Get AI response
-            with st.sidebar.spinner("🤔 Thinking..."):
+            with st.spinner("🤔 Thinking..."):
                 response = ai.chat(
                     user_message,
                     context=context,
