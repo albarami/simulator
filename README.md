@@ -1,170 +1,659 @@
 # 🏛️ Ministry of Labour - Fee Strategy & Revenue Optimizer Dashboard
 
-A comprehensive Streamlit dashboard for analyzing service fees, simulating revenue scenarios, and making data-driven decisions for the Ministry of Labour services.
+A comprehensive Streamlit dashboard for analyzing service fees, simulating revenue scenarios, and making data-driven decisions for the Ministry of Labour services in Qatar.
 
-## 📊 Features
+![Dashboard Version](https://img.shields.io/badge/version-1.0-blue)
+![Python](https://img.shields.io/badge/python-3.11+-green)
+![Streamlit](https://img.shields.io/badge/streamlit-1.31.0-red)
 
-### 1. **Executive Summary**
-- Real-time KPIs (Total Services, Requests, Revenue, Fee Coverage)
-- Key insights and quick actions
-- Trend visualizations and top services analysis
+---
 
-### 2. **Revenue Simulator**
-- **Single Service Mode**: Simulate fee changes for individual services with demand elasticity
-- **Category Mode**: Apply fees to entire service categories
-- **Multi-Service Mode**: Customize fees for multiple services simultaneously
+## 📋 Table of Contents
 
-### 3. **Top Opportunities**
-- Identify high-volume services without fees
-- Calculate potential revenue gains
-- Visual ranking of opportunities
+- [Overview](#overview)
+- [Quick Start](#quick-start)
+- [Dashboard Features](#dashboard-features)
+- [How to Use](#how-to-use)
+- [Apply Scenario Feature](#apply-scenario-feature)
+- [Deployment](#deployment)
+- [Data Structure](#data-structure)
+- [Tips & Best Practices](#tips--best-practices)
+- [Troubleshooting](#troubleshooting)
 
-### 4. **Trend Analysis & Forecasting**
-- Historical request trends (2022-2025)
-- Category performance analysis
-- Machine learning-based forecasting for future years
-- Growth rate analysis
+---
 
-### 5. **Service Comparison**
-- **Pareto Analysis**: Identify services that generate 80% of requests
-- **Quadrant Analysis**: Classify services by volume and revenue
-- Strategic recommendations per quadrant
+## 🎯 Overview
 
-### 6. **Scenario Planning**
-- Pre-built strategies (Conservative, Moderate, Aggressive)
-- Target revenue optimizer
-- Compare multiple scenarios side-by-side
-- Export scenarios to Excel
+This dashboard helps the Ministry of Labour analyze and optimize service fees by:
 
-### 7. **Portfolio Analysis**
-- Complete service catalog with advanced filters
-- Fee status distribution
-- Growth metrics and trends
+- **Analyzing** 54 services with historical data (2022-2025)
+- **Simulating** "what-if" scenarios for fee changes
+- **Forecasting** future demand using machine learning
+- **Identifying** high-impact revenue opportunities
+- **Comparing** multiple fee strategies side-by-side
+- **Applying** scenarios across all analytics in real-time
+
+### Key Statistics
+- 📊 **54 services** across 9 categories
+- 📈 **3+ million requests** tracked (2022-2025)
+- 💰 **68% services** currently without fees
+- 🎯 **Smart recommendations** for fee optimization
+
+---
 
 ## 🚀 Quick Start
 
 ### Installation
 
+1. **Clone the repository:**
 ```bash
-# Install dependencies
+git clone https://github.com/albarami/simulator.git
+cd simulator
+```
+
+2. **Install dependencies:**
+```bash
 pip install -r requirements.txt
 ```
 
-### Run Dashboard
-
+3. **Run the dashboard:**
 ```bash
-# Launch the dashboard
 streamlit run dashboard.py
 ```
 
-The dashboard will automatically open in your default browser at `http://localhost:8501`
-
-## 📁 Project Structure
-
-```
-D:\simulation\
-├── dashboard.py              # Main Streamlit application
-├── Book1.xlsx               # Source data (Ministry services)
-├── requirements.txt         # Python dependencies
-├── README.md               # This file
-└── utils/
-    ├── __init__.py
-    ├── data_loader.py      # Data loading and preprocessing
-    ├── analytics.py        # Analytics and calculations
-    ├── simulator.py        # Revenue simulation engine
-    └── visualizations.py   # Plotly chart functions
-```
-
-## 📊 Data Structure
-
-The dashboard expects an Excel file (`Book1.xlsx`) with the following columns:
-
-1. **اسم الخدمة** - Service Name
-2. **2022** - Requests in 2022
-3. **2023** - Requests in 2023
-4. **2024** - Requests in 2024
-5. **2025** - Requests in 2025
-6. **اجمالي العدد** - Total Requests
-7. **الرسوم الحالية** - Current Fees
-8. **ملاحظات و مقترح الرسوم** - Notes and Suggested Fees
-
-## 🎯 Use Cases
-
-### For Strategic Planning
-- Identify which services to prioritize for fee implementation
-- Compare different fee strategies (conservative vs aggressive)
-- Forecast future demand and revenue
-
-### For Revenue Optimization
-- Find quick wins (high-volume services without fees)
-- Optimize fees to meet target revenue goals
-- Understand demand elasticity impact
-
-### For Decision Making
-- Visualize trade-offs between different scenarios
-- Export scenarios for stakeholder review
-- Track performance metrics over time
-
-## 💡 Tips for Best Results
-
-1. **Start with Executive Summary** to understand current state
-2. **Explore Top Opportunities** to identify quick wins
-3. **Use Revenue Simulator** to test specific ideas
-4. **Compare Scenarios** to evaluate different strategies
-5. **Check Portfolio Analysis** for comprehensive view
-
-## 🎨 Dashboard Highlights
-
-- **Interactive Visualizations**: All charts are interactive with hover details
-- **Real-Time Calculations**: Instant feedback on fee changes
-- **Multi-Language Support**: Arabic service names supported
-- **Export Capabilities**: Save scenarios to Excel for sharing
-- **Responsive Design**: Works on desktop and tablet
-
-## 📈 Key Insights from Current Data
-
-- **54 services** across 9 categories
-- **3+ million total requests** (2022-2025)
-- **68% of services** currently have no fees
-- **Significant growth** from 2022 to 2025
-
-## 🔧 Technical Details
-
-- **Framework**: Streamlit 1.31.0
-- **Data Analysis**: Pandas, NumPy
-- **Visualizations**: Plotly
-- **Forecasting**: Scikit-learn (Linear Regression)
-- **Language**: Python 3.11+
-
-## 📝 Notes
-
-- Empty cells in year columns indicate no requests for that year
-- Demand elasticity default is -0.1 (conservative estimate)
-- All monetary values are in Qatari Riyals (QAR)
-- Forecasts are based on historical trends using linear regression
-
-## 🆘 Troubleshooting
-
-**Dashboard won't start:**
-- Ensure all dependencies are installed: `pip install -r requirements.txt`
-- Check that `Book1.xlsx` is in the same directory
-
-**Data not loading:**
-- Verify Excel file name and location
-- Ensure Excel file follows the expected structure
-
-**Charts not displaying:**
-- Clear browser cache
-- Try a different browser
-- Check console for JavaScript errors
-
-## 📧 Support
-
-For questions or issues, refer to the Streamlit documentation: https://docs.streamlit.io
+4. **Open in browser:**
+The dashboard will automatically open at `http://localhost:8501`
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: November 2025  
-**Built for**: Ministry of Labour - State of Qatar
+## 📊 Dashboard Features
 
+### 1. 📈 **Executive Summary**
+
+Your command center for high-level insights.
+
+**What you see:**
+- Total services, requests, and current revenue
+- Fee coverage percentage
+- Year-over-year growth trends
+- Top 10 services by volume
+- Category distribution charts
+
+**How to use:**
+- Start here to understand the current state
+- Check KPI cards for quick metrics
+- Review trends to see growth patterns
+- Identify which categories dominate requests
+
+**Best for:** Getting an overview before diving into details
+
+---
+
+### 2. 🎯 **Revenue Simulator**
+
+Test "what-if" scenarios before implementing changes.
+
+#### **Mode 1: Single Service**
+
+**Step-by-step:**
+1. Select a service from the dropdown
+2. Current status shows: requests, current fee, revenue, category
+3. Use slider to set new fee (0-200 QAR)
+4. Adjust demand elasticity (-1.0 to 0.0)
+   - `-0.1` = Conservative (10% price increase = 1% demand decrease)
+   - `-0.5` = Aggressive (10% price increase = 5% demand decrease)
+5. View instant impact on revenue and requests
+6. Click **"✅ Apply This Scenario"** to see impact across all tabs
+
+**Example:**
+```
+Service: تجديد ترخيص عمل عام
+Current Fee: 0 QAR
+New Fee: 10 QAR
+Requests: 681,475
+→ Impact: +6,814,750 QAR annual revenue
+```
+
+#### **Mode 2: Service Category**
+
+**Step-by-step:**
+1. Select a category (e.g., "Work Permits & Recruitment")
+2. Set fee to apply to all services in category
+3. Choose: Apply to all services OR only services without fees
+4. View total category impact
+5. Click **"✅ Apply This Scenario"**
+
+**Use case:** Implement consistent pricing across similar services
+
+#### **Mode 3: Multiple Services**
+
+**Step-by-step:**
+1. Select multiple services using the multiselect dropdown
+2. Set individual fees for each service
+3. Click **"Calculate Total Impact"** to see combined effect
+4. Review metrics (revenue increase, services modified)
+5. Click **"✅ Apply This Scenario"**
+
+**Use case:** Test custom fee combinations for specific services
+
+---
+
+### 3. 💰 **Top Opportunities**
+
+Find quick wins - high-volume services without fees.
+
+**How to use:**
+1. Set suggested fee using slider (1-100 QAR)
+2. Choose number of opportunities to display (5-20)
+3. Review chart showing potential revenue gain
+4. Examine detailed table with service names, requests, and potential revenue
+5. Note the total potential revenue at the bottom
+
+**Strategy tips:**
+- Start with 5-10 QAR for low-risk testing
+- Focus on services with 10,000+ requests
+- Prioritize services in high-demand categories
+
+**Example output:**
+```
+Top Opportunity: تجديد ترخيص عمل عام
+- Current Fee: 0 QAR
+- Requests: 681,475
+- With 10 QAR fee → +6.8M QAR/year
+```
+
+---
+
+### 4. 📊 **Trend Analysis & Forecasting**
+
+Understand historical patterns and predict future demand.
+
+**Features:**
+
+#### **Overall Trends**
+- Line chart showing total requests 2022-2025
+- Identify growth or decline patterns
+- Spot seasonal variations
+
+#### **Category Performance**
+- Compare categories by: service count, total requests, revenue
+- See which categories have fee coverage
+- Identify underperforming categories
+
+#### **Service Forecast**
+**How to use:**
+1. Select any service from dropdown
+2. View historical data (2022-2025)
+3. See ML-predicted forecasts for 2026-2027
+4. Use forecasts to plan capacity and revenue projections
+
+**Example:**
+```
+Service: تصديق عقود عمل
+2024: 452,306 requests
+2025: 567,003 requests
+Forecast 2026: 682,000 requests (predicted)
+```
+
+---
+
+### 5. 🔍 **Service Comparison**
+
+Analyze service portfolio using proven business frameworks.
+
+#### **Pareto Analysis (80/20 Rule)**
+
+**What it shows:**
+- Bar chart: Individual service volumes
+- Line chart: Cumulative percentage
+- Green line: 80% threshold
+
+**Insight:**
+"20% of services generate 80% of requests - focus fee strategy here"
+
+**How to read:**
+- Services ranked by volume (left to right)
+- First few services = highest impact opportunities
+- Services below 80% line = lower priority
+
+#### **Portfolio Quadrant Analysis**
+
+Services categorized into 4 strategic groups:
+
+| Quadrant | Volume | Revenue | Strategy |
+|----------|--------|---------|----------|
+| 🟢 **High/High** | High | High | Maintain & Optimize |
+| 🟡 **High/Low** | High | Low | **Quick Win - Add Fees** |
+| 🔵 **Low/High** | Low | High | Premium Services |
+| 🔴 **Low/Low** | Low | Low | Review Need |
+
+**How to use:**
+1. View scatter plot with services positioned by volume & revenue
+2. Focus on 🟡 High Volume/Low Revenue = biggest opportunities
+3. Check quadrant summary cards for counts
+4. Use strategies suggested for each quadrant
+
+---
+
+### 6. 🎭 **Scenario Planning**
+
+Create and compare comprehensive fee strategies.
+
+#### **Quick Scenarios**
+
+Three pre-built strategies ready to test:
+
+**💼 Conservative Strategy**
+- High volume services (50K+ requests): 20 QAR
+- Medium volume: 10 QAR
+- Low volume: 5 QAR
+- **Best for:** Risk-averse approach, minimal disruption
+
+**⚡ Moderate Strategy**
+- High volume services (30K+ requests): 50 QAR
+- Medium volume: 20 QAR
+- Low volume: 10 QAR
+- **Best for:** Balanced revenue growth
+
+**🚀 Aggressive Strategy**
+- High volume services (20K+ requests): 100 QAR
+- Medium volume: 50 QAR
+- Low volume: 20 QAR
+- **Best for:** Maximum revenue generation
+
+**How to use:**
+1. Click any strategy button
+2. Review scenario details and services modified
+3. Click **"✅ Apply"** button to activate
+4. Navigate to other tabs to see full impact
+
+#### **Target Revenue Optimizer**
+
+Automatically calculate fees to reach revenue goals.
+
+**Step-by-step:**
+1. Set target annual revenue (e.g., 10,000,000 QAR)
+2. Set maximum allowed fee per service (e.g., 100 QAR)
+3. Click **"🎯 Optimize"**
+4. System automatically assigns fees to reach target
+5. Review which services get fees
+6. Click **"✅ Apply"** if satisfied
+
+**How it works:**
+- Prioritizes high-volume services
+- Stays within max fee limit
+- Optimizes to reach target with minimal services modified
+
+#### **Scenario Comparison**
+
+Compare all created scenarios side-by-side:
+- See total revenue for each
+- Compare revenue increase percentages
+- Review number of services modified
+- Export scenarios to Excel for reports
+
+---
+
+### 7. 📉 **Portfolio Analysis**
+
+Complete service catalog with advanced filtering.
+
+**Filters available:**
+- **Category filter:** Select specific categories
+- **Fee status:** All / With Fees / Without Fees
+- **Minimum requests:** Filter by volume threshold
+
+**Table columns:**
+- Service name
+- Category
+- Yearly requests (2022-2025)
+- Total requests
+- Current fee
+- Current annual revenue
+
+**How to use:**
+1. Set filters to narrow down services
+2. Review complete data in table
+3. Sort by clicking column headers
+4. Use for detailed analysis and reporting
+
+---
+
+## ✨ Apply Scenario Feature
+
+### **What is it?**
+
+The Apply Scenario feature lets you test fee changes in the simulator, then **apply them across the entire dashboard** to see the full impact on all analytics, charts, and reports.
+
+### **How it works:**
+
+#### **Step 1: Create Scenario**
+- Use Revenue Simulator or Scenario Planning
+- Set fees for one or more services
+- Review calculated impact
+
+#### **Step 2: Apply Scenario**
+- Click **"✅ Apply This Scenario"** button
+- Green banner appears at top of dashboard
+- Banner shows:
+  - Scenario name
+  - Revenue impact (+X QAR, Y%)
+  - Number of services modified
+  - **"🔄 Reset to Original Data"** button
+
+#### **Step 3: Explore Impact**
+Navigate to any tab and see updated data:
+- ✅ Executive Summary: Updated KPIs and metrics
+- ✅ Top Opportunities: Recalculated with new fees
+- ✅ Trend Analysis: Adjusted revenue projections
+- ✅ Service Comparison: Updated Pareto and quadrants
+- ✅ Portfolio Analysis: Modified fee values in table
+
+#### **Step 4: Reset When Done**
+- Click **"🔄 Reset to Original Data"** in green banner
+- Dashboard returns to original state
+- Ready to test another scenario
+
+### **Use Cases:**
+
+**Stakeholder Presentations:**
+```
+1. Apply "Moderate Strategy"
+2. Navigate through all tabs showing impact
+3. Present comprehensive analysis with one scenario active
+4. Reset and show "Aggressive Strategy" for comparison
+```
+
+**Decision Making:**
+```
+1. Test multiple scenarios
+2. Apply each one to see full dashboard impact
+3. Compare metrics across tabs
+4. Choose best strategy based on comprehensive view
+```
+
+**What-If Analysis:**
+```
+1. "What if we only add fees to high-volume services?"
+2. Apply scenario → Check Executive Summary
+3. "How does this affect revenue distribution?"
+4. Check Portfolio Analysis with scenario active
+```
+
+---
+
+## 🌐 Deployment
+
+### **Deploy to Streamlit Cloud (Free)**
+
+1. **Go to:** https://streamlit.io/cloud
+2. **Sign in** with GitHub
+3. **Click** "New app"
+4. **Fill in:**
+   - Repository: `albarami/simulator`
+   - Branch: `main`
+   - Main file: `dashboard.py`
+   - App URL: Choose custom name (e.g., `mol-fee-optimizer`)
+5. **Click** "Deploy!"
+6. **Wait** 2-5 minutes
+7. **Done!** Get your public URL: `https://[your-app].streamlit.app`
+
+### **Auto-Updates**
+
+When you push changes to GitHub:
+```bash
+git add .
+git commit -m "Update dashboard"
+git push origin main
+```
+Streamlit Cloud automatically redeploys! 🎉
+
+---
+
+## 📁 Data Structure
+
+### **Input File: Book1.xlsx**
+
+Required columns:
+
+| Column Name (Arabic) | Data Type | Description |
+|---------------------|-----------|-------------|
+| اسم الخدمة | Text | Service name |
+| 2022 | Number | Requests in 2022 |
+| 2023 | Number | Requests in 2023 |
+| 2024 | Number | Requests in 2024 |
+| 2025 | Number | Requests in 2025 |
+| اجمالي العدد | Number | Total requests |
+| الرسوم الحالية | Text | Current fees (can be "لا يوجد" or number) |
+| ملاحظات و مقترح الرسوم | Text | Notes and suggested fees |
+
+**Empty cells:** Treated as zero requests (no data for that year)
+
+### **Updating Data**
+
+To update with new data:
+1. Replace `Book1.xlsx` with new file (keep same structure)
+2. Restart dashboard or refresh browser
+3. Data automatically reloads
+
+---
+
+## 💡 Tips & Best Practices
+
+### **For Analysts**
+
+1. **Start broad, then narrow:**
+   - Begin with Executive Summary
+   - Identify trends in Trend Analysis
+   - Focus on opportunities in Top Opportunities
+   - Drill down in Portfolio Analysis
+
+2. **Use Apply Scenario for presentations:**
+   - Prepare 2-3 scenarios beforehand
+   - Apply during presentation to show live impact
+   - Switch between scenarios for comparison
+
+3. **Combine insights:**
+   - Use Pareto to find top 20% services
+   - Check their categories in Portfolio Analysis
+   - Create category-based scenario in Simulator
+
+### **For Decision Makers**
+
+1. **Test before implementing:**
+   - Use conservative elasticity (-0.1) for safer estimates
+   - Start with Quick Opportunities (5-10 QAR)
+   - Review impact across all tabs with Apply Scenario
+
+2. **Consider categories:**
+   - Group similar services with consistent pricing
+   - Use Service Category mode in simulator
+   - Check category performance in Trend Analysis
+
+3. **Monitor forecasts:**
+   - Check predicted demand for 2026-2027
+   - Plan fees based on expected growth
+   - Adjust strategies for declining services
+
+### **For Presentations**
+
+1. **Story flow:**
+   - Executive Summary: "Here's where we are"
+   - Top Opportunities: "Here's the potential"
+   - Revenue Simulator: "Here's what happens if..."
+   - Apply Scenario: "Let's see the full impact"
+   - Scenario Planning: "Compare strategies"
+
+2. **Use visuals:**
+   - Charts are interactive (hover for details)
+   - Zoom in on important sections
+   - Export scenarios to Excel for reports
+
+---
+
+## 🔧 Troubleshooting
+
+### **Dashboard won't start**
+
+**Problem:** Error loading data
+**Solution:**
+```bash
+# Ensure Book1.xlsx is in the same directory
+ls Book1.xlsx
+
+# Reinstall dependencies
+pip install -r requirements.txt
+
+# Try running again
+streamlit run dashboard.py
+```
+
+### **Charts not displaying**
+
+**Problem:** Blank visualization areas
+**Solution:**
+- Clear browser cache (Ctrl+F5 or Cmd+Shift+R)
+- Try different browser (Chrome recommended)
+- Check browser console for errors (F12)
+
+### **Scenario not applying**
+
+**Problem:** Clicked Apply but no banner appears
+**Solution:**
+- Wait 2-3 seconds for page refresh
+- Check if button was clicked (should show success message)
+- Navigate to different tab and back
+
+### **Slow performance**
+
+**Problem:** Dashboard loading slowly
+**Solution:**
+- Reduce number of services in multi-service mode
+- Filter data in Portfolio Analysis
+- Clear browser cache
+- Restart Streamlit server
+
+### **Excel file errors**
+
+**Problem:** "Error loading data" message
+**Solution:**
+- Ensure Excel file has correct column names (Arabic)
+- Check for missing columns
+- Verify Excel file is not corrupted
+- Ensure file is not open in Excel (close it)
+
+---
+
+## 📚 Technical Details
+
+### **Architecture**
+
+```
+dashboard.py           # Main Streamlit application
+├── utils/
+│   ├── data_loader.py    # Data loading & preprocessing
+│   ├── analytics.py      # Analytics functions
+│   ├── simulator.py      # Scenario simulation engine
+│   └── visualizations.py # Plotly chart generation
+├── Book1.xlsx         # Source data
+└── requirements.txt   # Python dependencies
+```
+
+### **Key Technologies**
+
+- **Streamlit 1.31.0** - Web framework
+- **Pandas** - Data manipulation
+- **Plotly** - Interactive visualizations
+- **Scikit-learn** - ML forecasting (Linear Regression)
+- **NumPy** - Numerical computations
+
+### **Features**
+
+- 🔄 Real-time calculations
+- 💾 Session state management for scenarios
+- 📊 9 categories of services
+- 🎯 Demand elasticity modeling
+- 🔮 ML-based forecasting
+- 📈 Pareto analysis
+- 🎨 Responsive design
+
+---
+
+## 📞 Support
+
+### **Common Questions**
+
+**Q: Can I use my own Excel file?**
+A: Yes! Just ensure it has the same column structure (see Data Structure section)
+
+**Q: How many scenarios can I create?**
+A: Unlimited! Create, compare, and apply as many as needed.
+
+**Q: Can I export results?**
+A: Yes! Use the Export button in Scenario Planning to save scenarios to Excel.
+
+**Q: Is the data secure?**
+A: If deployed on Streamlit Cloud, the repository is public. For sensitive data, use a private repository or deploy on private infrastructure.
+
+**Q: Can I add more services?**
+A: Yes! Add rows to the Excel file with the same column structure.
+
+---
+
+## 🎓 Learning Resources
+
+### **Streamlit Documentation**
+- https://docs.streamlit.io
+
+### **Dashboard Concepts**
+- **Pareto Analysis**: 80/20 rule for prioritization
+- **Demand Elasticity**: How price changes affect demand
+- **Portfolio Analysis**: BCG Matrix-style categorization
+
+### **For Developers**
+
+Want to customize? Check these files:
+- `dashboard.py` - Modify UI and layout
+- `utils/visualizations.py` - Customize charts
+- `utils/simulator.py` - Adjust simulation logic
+- `utils/analytics.py` - Add new analytics
+
+---
+
+## 📄 License
+
+This project is developed for the Ministry of Labour - State of Qatar.
+
+---
+
+## 🌟 Version History
+
+**v1.0** (November 2025)
+- ✅ Initial release
+- ✅ 7 dashboard sections
+- ✅ Apply Scenario feature
+- ✅ ML-based forecasting
+- ✅ 54 services tracked
+- ✅ GitHub deployment
+
+---
+
+## 👥 Credits
+
+**Developed by:** AI Assistant with User Collaboration
+**For:** Ministry of Labour - State of Qatar
+**Repository:** https://github.com/albarami/simulator
+
+---
+
+## 🚀 Get Started Now!
+
+```bash
+# Clone and run
+git clone https://github.com/albarami/simulator.git
+cd simulator
+pip install -r requirements.txt
+streamlit run dashboard.py
+```
+
+**Open your browser and start optimizing! 🎯**
