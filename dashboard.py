@@ -345,33 +345,36 @@ def main():
         if ai and ai.is_available():
             st.subheader("🤖 AI Strategic Insights")
             
-            with st.spinner("🤔 Analyzing data..."):
-                # Prepare data for insights
-                top_service = df.nlargest(1, 'اجمالي العدد').iloc[0]
-                insight_data = {
-                    "total_services": summary['total_services'],
-                    "total_requests": summary['total_requests'],
-                    "services_without_fees": summary['services_without_fees'],
-                    "no_fee_pct": (summary['services_without_fees'] / summary['total_services'] * 100),
-                    "current_revenue": summary['current_total_revenue'],
-                    "top_service": top_service['اسم الخدمة'],
-                    "top_requests": int(top_service['اجمالي العدد'])
-                }
-                
-                # Generate insights
-                insights = ai.generate_insights(
-                    insight_data,
-                    insight_type="executive_summary",
-                    language=st.session_state.language
-                )
-                
-                # Display in nice box
-                st.markdown(f"""
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            padding: 20px; border-radius: 10px; color: white; margin-bottom: 20px;">
-                    {insights.replace(chr(10), '<br>')}
-                </div>
-                """, unsafe_allow_html=True)
+            try:
+                with st.spinner("🤔 Analyzing data..."):
+                    # Prepare data for insights
+                    top_service = df.nlargest(1, 'اجمالي العدد').iloc[0]
+                    insight_data = {
+                        "total_services": summary['total_services'],
+                        "total_requests": summary['total_requests'],
+                        "services_without_fees": summary['services_without_fees'],
+                        "no_fee_pct": (summary['services_without_fees'] / summary['total_services'] * 100),
+                        "current_revenue": summary['current_total_revenue'],
+                        "top_service": top_service['اسم الخدمة'],
+                        "top_requests": int(top_service['اجمالي العدد'])
+                    }
+                    
+                    # Generate insights
+                    insights = ai.generate_insights(
+                        insight_data,
+                        insight_type="executive_summary",
+                        language=st.session_state.language
+                    )
+                    
+                    # Display in nice box
+                    st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                padding: 20px; border-radius: 10px; color: white; margin-bottom: 20px;">
+                        {insights.replace(chr(10), '<br>')}
+                    </div>
+                    """, unsafe_allow_html=True)
+            except Exception as e:
+                st.warning(f"⚠️ AI insights temporarily unavailable. Using cached data. ({str(e)[:100]})")
         
         # Key Insights
         col1, col2 = st.columns(2)
@@ -677,29 +680,32 @@ def main():
         if ai and ai.is_available():
             st.subheader("🤖 AI Strategic Analysis")
             
-            with st.spinner("🤔 Analyzing opportunities..."):
-                # Prepare opportunities data
-                opps_summary = []
-                for _, row in opportunities.head(5).iterrows():
-                    opps_summary.append(
-                        f"- {row['اسم الخدمة']}: {int(row['اجمالي العدد']):,} requests → {row['Revenue_Gain']:,.0f} QAR potential"
+            try:
+                with st.spinner("🤔 Analyzing opportunities..."):
+                    # Prepare opportunities data
+                    opps_summary = []
+                    for _, row in opportunities.head(5).iterrows():
+                        opps_summary.append(
+                            f"- {row['اسم الخدمة']}: {int(row['اجمالي العدد']):,} requests → {row['Revenue_Gain']:,.0f} QAR potential"
+                        )
+                    
+                    insight_data = {
+                        "opportunities_data": "\n".join(opps_summary),
+                        "suggested_fee": suggested_fee,
+                        "total_potential": opportunities['Revenue_Gain'].sum()
+                    }
+                    
+                    # Generate insights
+                    insights = ai.generate_insights(
+                        insight_data,
+                        insight_type="opportunities",
+                        language=st.session_state.language
                     )
-                
-                insight_data = {
-                    "opportunities_data": "\n".join(opps_summary),
-                    "suggested_fee": suggested_fee,
-                    "total_potential": opportunities['Revenue_Gain'].sum()
-                }
-                
-                # Generate insights
-                insights = ai.generate_insights(
-                    insight_data,
-                    insight_type="opportunities",
-                    language=st.session_state.language
-                )
-                
-                # Display in info box
-                st.info(insights)
+                    
+                    # Display in info box
+                    st.info(insights)
+            except Exception as e:
+                st.warning(f"⚠️ AI analysis temporarily unavailable. ({str(e)[:100]})")
         
         st.subheader("📋 Detailed Opportunities")
         

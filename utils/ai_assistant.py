@@ -219,9 +219,9 @@ class AIAssistant:
             if cached_response:
                 return cached_response
             
-            # Call Claude
+            # Call Claude - using Sonnet 3.5
             message = self.anthropic_client.messages.create(
-                model="claude-3-5-sonnet-latest",
+                model="claude-3-5-sonnet-20241022",
                 max_tokens=1500,
                 system=SYSTEM_PROMPTS[language]["insights"],
                 messages=[{"role": "user", "content": prompt}]
@@ -308,7 +308,7 @@ class AIAssistant:
             
             # Call Claude with longer context
             message = self.anthropic_client.messages.create(
-                model="claude-3-5-sonnet-latest",
+                model="claude-3-5-sonnet-20241022",
                 max_tokens=4000,
                 system=SYSTEM_PROMPTS[language]["report"],
                 messages=[{"role": "user", "content": prompt}]
