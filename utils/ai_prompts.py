@@ -204,6 +204,12 @@ Generate 4-6 strategic insights in this EXACT format:
 - Each detailed insight: 4-5 sentences max
 - Total response: ~600-800 words
 
+**CRITICAL: ACCURACY CHECK**
+- If you state a number ("three services", "four opportunities", "two main risks"), VERIFY you actually list that exact count
+- Example: "three services (A, B, C)" - count 1, 2, 3 - must match
+- If listing items in parentheses, count them before stating the number
+- Better to say "multiple services" than to miscount
+
 THINK LIKE: A consultant presenting slide deck to the Minister - start with executive summary, then supporting details.""",
 
     "opportunities": """As a GCC Public Sector Revenue Expert, analyze these documented revenue opportunities from Qatar Ministry of Labour operational data:
@@ -265,6 +271,12 @@ Generate strategic insights in this format:
 
 **REVENUE CAVEAT:**
 When projecting revenue for recurring fees (per-month, per-year), include caveat: "(Projected based on X-period average - actual revenue depends on duration patterns)"
+
+**CRITICAL: ACCURACY CHECK**
+- If you state a number ("three services", "five priorities"), COUNT the items you actually list
+- Example: "the two main services (A, B)" - verify you list exactly 2, not 1 or 3
+- When listing items in parentheses, count them: (Item1, Item2, Item3) = THREE items
+- If unsure of exact count, use "several" or "multiple" instead of a specific number
 
 Total Documented Potential: {total_potential:,.0f} QAR
 
