@@ -17,7 +17,11 @@ from utils.analytics import (
     forecast_requests,
     calculate_category_performance,
     calculate_pareto_analysis,
-    get_service_quadrant
+    get_service_quadrant,
+    analyze_suggested_fees,
+    identify_quick_wins,
+    calculate_suggestion_implementation_impact,
+    compare_current_vs_suggested
 )
 from utils.simulator import RevenueSimulator
 from utils.visualizations import (
@@ -30,7 +34,11 @@ from utils.visualizations import (
     plot_quadrant_analysis,
     plot_pareto_chart,
     plot_forecast,
-    plot_opportunities_chart
+    plot_opportunities_chart,
+    plot_current_vs_suggested_fees,
+    plot_quick_wins_dashboard,
+    plot_revenue_gap_waterfall,
+    plot_fee_structure_distribution
 )
 
 
@@ -280,6 +288,7 @@ def main():
             "📈 Executive Summary",
             "🎯 Revenue Simulator",
             "💰 Top Opportunities",
+            "💡 Quick Wins",
             "📊 Trend Analysis",
             "🔍 Service Comparison",
             "🎭 Scenario Planning",
@@ -333,6 +342,55 @@ def main():
                     f"{fee_coverage:.1f}%",
                     f"{summary['services_without_fees']} services without fees",
                     icon="📌"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        # Add Suggestions KPIs
+        suggestions_analysis = analyze_suggested_fees(df)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.markdown(
+                create_kpi_card(
+                    "Services with Suggestions",
+                    f"{suggestions_analysis['total_services_with_suggestions']}",
+                    f"{suggestions_analysis['total_services_with_suggestions']/len(df)*100:.0f}% of total",
+                    icon="💡"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        with col2:
+            st.markdown(
+                create_kpi_card(
+                    "Untapped Revenue",
+                    f"{suggestions_analysis['total_revenue_gap']:,.0f} QAR",
+                    "from suggested fees",
+                    icon="🎯"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        with col3:
+            st.markdown(
+                create_kpi_card(
+                    "High Confidence Suggestions",
+                    f"{suggestions_analysis['high_confidence_count']}",
+                    f"{suggestions_analysis['high_confidence_potential']:,.0f} QAR potential",
+                    icon="⭐"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        with col4:
+            st.markdown(
+                create_kpi_card(
+                    "Quick Wins Available",
+                    f"{suggestions_analysis['quick_wins_count']}",
+                    f"{suggestions_analysis['quick_wins_potential']:,.0f} QAR",
+                    icon="⚡"
                 ),
                 unsafe_allow_html=True
             )
@@ -442,6 +500,10 @@ def main():
                 
                 service_data = df[df['اسم الخدمة'] == selected_service].iloc[0]
                 
+                # Check if service has a suggestion
+                has_suggestion = service_data['Suggested_Fee_Numeric'] > 0
+                suggested_fee_value = int(service_data['Suggested_Fee_Numeric']) if has_suggestion else 10
+                
                 st.info(f"""
                 **Current Status:**
                 - Total Requests: **{int(service_data['اجمالي العدد']):,}**
@@ -450,13 +512,42 @@ def main():
                 - Category: **{service_data['Category']}**
                 """)
                 
-                new_fee = st.slider(
-                    "Set New Fee (QAR)",
-                    min_value=0,
-                    max_value=200,
-                    value=int(service_data['Current_Fee_Numeric']) if service_data['Current_Fee_Numeric'] > 0 else 10,
-                    step=5
-                )
+                # Show suggestion if available
+                if has_suggestion:
+                    st.success(f"""
+                    **💡 Suggested Fee Available:** {suggested_fee_value} QAR
+                    - Fee Type: {service_data['Fee_Structure_Type'].replace('_', ' ').title()}
+                    - Revenue Potential: {service_data['Suggested_Revenue_Potential']:,.0f} QAR
+                    - Confidence: {service_data['Fee_Suggestion_Confidence']*100:.0f}%
+                    """)
+                    
+                    # Show suggestion details
+                    if pd.notna(service_data['ملاحظات و مقترح الرسوم']):
+                        with st.expander("📝 View Full Suggestion"):
+                            st.write(service_data['ملاحظات و مقترح الرسوم'])
+                
+                # Fee slider with option to use suggested fee
+                col_slider, col_btn = st.columns([3, 1])
+                with col_slider:
+                    # Initialize with suggested fee if available
+                    default_value = suggested_fee_value if has_suggestion else (int(service_data['Current_Fee_Numeric']) if service_data['Current_Fee_Numeric'] > 0 else 10)
+                    
+                    new_fee = st.slider(
+                        "Set New Fee (QAR)",
+                        min_value=0,
+                        max_value=200,
+                        value=default_value,
+                        step=5,
+                        key=f"fee_slider_{selected_service}"
+                    )
+                
+                with col_btn:
+                    if has_suggestion:
+                        st.write("")  # Spacing
+                        st.write("")  # Spacing
+                        if st.button("💡 Use Suggested", key="use_suggested_single"):
+                            new_fee = suggested_fee_value
+                            st.rerun()
                 
                 elasticity = st.slider(
                     "Demand Elasticity (Impact on demand)",
@@ -728,6 +819,246 @@ def main():
         # Summary
         total_potential = opportunities['Revenue_Gain'].sum()
         st.success(f"**Total Potential Revenue from Top {top_n} Opportunities: {total_potential:,.0f} QAR**")
+    
+    # === QUICK WINS ===
+    elif page == "💡 Quick Wins":
+        st.header("💡 Quick Wins with Suggested Fees")
+        st.markdown("High-impact opportunities with **documented fee suggestions** from operational data.")
+        
+        # Get suggestions analysis
+        suggestions_analysis = analyze_suggested_fees(df)
+        
+        # Header KPIs
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.markdown(
+                create_kpi_card(
+                    "Services with Suggestions",
+                    f"{suggestions_analysis['total_services_with_suggestions']}",
+                    f"of {len(df)} total services",
+                    icon="💡"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        with col2:
+            st.markdown(
+                create_kpi_card(
+                    "Total Revenue Potential",
+                    f"{suggestions_analysis['total_revenue_gap']:,.0f} QAR",
+                    "from implementing suggestions",
+                    icon="💰"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        with col3:
+            st.markdown(
+                create_kpi_card(
+                    "Quick Win Services",
+                    f"{suggestions_analysis['quick_wins_count']}",
+                    f"{suggestions_analysis['quick_wins_potential']:,.0f} QAR potential",
+                    icon="⚡"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        with col4:
+            avg_gain = suggestions_analysis['avg_revenue_gain']
+            st.markdown(
+                create_kpi_card(
+                    "Avg Revenue Gain",
+                    f"{avg_gain:,.0f} QAR",
+                    "per service with suggestion",
+                    icon="📊"
+                ),
+                unsafe_allow_html=True
+            )
+        
+        st.markdown("---")
+        
+        # Section 1: Top Quick Wins
+        st.subheader("⚡ Top Quick Wins")
+        st.markdown("Services with **documented suggestions**, high volume, and currently no or low fees.")
+        
+        col1, col2 = st.columns([1, 4])
+        
+        with col1:
+            min_volume = st.number_input(
+                "Min Request Volume",
+                min_value=1000,
+                max_value=100000,
+                value=10000,
+                step=1000
+            )
+            
+            top_quick_wins_n = st.slider(
+                "Number to Show",
+                min_value=5,
+                max_value=20,
+                value=10,
+                step=1
+            )
+        
+        with col2:
+            # Get quick wins
+            quick_wins = identify_quick_wins(df, min_requests=min_volume, top_n=top_quick_wins_n)
+            
+            if len(quick_wins) > 0:
+                st.plotly_chart(plot_revenue_gap_waterfall(df[df['Suggested_Fee_Numeric'] > 0], top_quick_wins_n), use_container_width=True)
+            else:
+                st.info("No quick wins found with current filters. Try lowering the minimum volume threshold.")
+        
+        # Detailed Quick Wins Table
+        if len(quick_wins) > 0:
+            st.subheader("📋 Detailed Quick Wins Analysis")
+            
+            # Display quick wins with expandable details
+            for idx, row in quick_wins.iterrows():
+                with st.expander(f"🎯 {row['اسم الخدمة'][:60]}... - **{row['Revenue_Gap']:,.0f} QAR** potential"):
+                    col1, col2, col3 = st.columns(3)
+                    
+                    with col1:
+                        st.metric("Total Requests", f"{int(row['اجمالي العدد']):,}")
+                        st.metric("Current Fee", f"{row['Current_Fee_Numeric']:.0f} QAR")
+                    
+                    with col2:
+                        st.metric("Suggested Fee", f"{row['Suggested_Fee_Numeric']:.0f} QAR")
+                        st.metric("Fee Structure", row['Fee_Structure_Type'].replace('_', ' ').title())
+                    
+                    with col3:
+                        st.metric("Revenue Potential", f"{row['Suggested_Revenue_Potential']:,.0f} QAR")
+                        confidence_pct = row['Fee_Suggestion_Confidence'] * 100
+                        st.metric("Confidence", f"{confidence_pct:.0f}%")
+                    
+                    # Show full suggestion text
+                    st.markdown("**📝 Original Suggestion:**")
+                    st.info(row['ملاحظات و مقترح الرسوم'])
+                    
+                    # Show special conditions if any
+                    if row['Special_Conditions']:
+                        st.markdown("**⚠️ Special Conditions:**")
+                        st.warning(row['Special_Conditions'])
+                    
+                    # Action button
+                    col_action1, col_action2 = st.columns(2)
+                    with col_action1:
+                        if st.button(f"💰 Apply to Simulator", key=f"apply_qw_{idx}"):
+                            # Create scenario with this service's suggested fee
+                            fee_changes = {row['اسم الخدمة']: row['Suggested_Fee_Numeric']}
+                            scenario = simulator.create_scenario(
+                                f"QuickWin_{row['اسم الخدمة'][:20]}",
+                                fee_changes,
+                                f"Apply suggested fee of {row['Suggested_Fee_Numeric']} QAR"
+                            )
+                            st.session_state.active_scenario = scenario
+                            st.success("✅ Applied! View impact in other sections.")
+                            st.rerun()
+        
+        st.markdown("---")
+        
+        # Section 2: Visualizations
+        st.subheader("📊 Suggestions Analysis")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Current vs Suggested Fees comparison
+            if len(quick_wins) > 0:
+                st.plotly_chart(plot_current_vs_suggested_fees(df, top_n=10), use_container_width=True)
+            else:
+                st.info("Add more services with suggestions to see comparison.")
+        
+        with col2:
+            # Fee structure distribution
+            if suggestions_analysis['total_services_with_suggestions'] > 0:
+                st.plotly_chart(plot_fee_structure_distribution(df), use_container_width=True)
+            else:
+                st.info("No fee structure data available.")
+        
+        st.markdown("---")
+        
+        # Section 3: Batch Actions
+        st.subheader("🚀 Batch Implementation")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("⚡ Apply Top 5 Suggestions", type="primary", use_container_width=True):
+                if len(quick_wins) >= 5:
+                    top_5_services = quick_wins.head(5)
+                    fee_changes = {
+                        row['اسم الخدمة']: row['Suggested_Fee_Numeric'] 
+                        for _, row in top_5_services.iterrows()
+                    }
+                    scenario = simulator.create_scenario(
+                        "Top_5_Quick_Wins",
+                        fee_changes,
+                        "Implement top 5 quick win suggestions"
+                    )
+                    st.session_state.active_scenario = scenario
+                    st.success(f"✅ Applied! Revenue increase: +{scenario['revenue_increase']:,.0f} QAR")
+                    st.rerun()
+                else:
+                    st.warning("Need at least 5 quick wins to apply.")
+        
+        with col2:
+            if st.button("🎯 Conservative (50%)", use_container_width=True):
+                if len(quick_wins) > 0:
+                    # Apply 50% of suggested fees
+                    fee_changes = {
+                        row['اسم الخدمة']: row['Suggested_Fee_Numeric'] * 0.5 
+                        for _, row in quick_wins.iterrows()
+                    }
+                    scenario = simulator.create_scenario(
+                        "Conservative_Suggestions",
+                        fee_changes,
+                        "Conservative: 50% of suggested fees"
+                    )
+                    st.session_state.active_scenario = scenario
+                    st.success(f"✅ Applied! Revenue increase: +{scenario['revenue_increase']:,.0f} QAR")
+                    st.rerun()
+        
+        with col3:
+            if st.button("🚀 Aggressive (100%)", use_container_width=True):
+                if len(quick_wins) > 0:
+                    # Apply 100% of suggested fees
+                    fee_changes = {
+                        row['اسم الخدمة']: row['Suggested_Fee_Numeric'] 
+                        for _, row in quick_wins.iterrows()
+                    }
+                    scenario = simulator.create_scenario(
+                        "Aggressive_Suggestions",
+                        fee_changes,
+                        "Aggressive: 100% of suggested fees"
+                    )
+                    st.session_state.active_scenario = scenario
+                    st.success(f"✅ Applied! Revenue increase: +{scenario['revenue_increase']:,.0f} QAR")
+                    st.rerun()
+        
+        # Export button
+        st.markdown("---")
+        if len(quick_wins) > 0:
+            # Prepare export data
+            export_df = quick_wins[[
+                'اسم الخدمة', 'Category', 'اجمالي العدد', 
+                'Current_Fee_Numeric', 'Suggested_Fee_Numeric', 
+                'Revenue_Gap', 'Fee_Structure_Type', 'ملاحظات و مقترح الرسوم'
+            ]].copy()
+            export_df.columns = [
+                'Service', 'Category', 'Total Requests',
+                'Current Fee', 'Suggested Fee', 
+                'Revenue Gain', 'Fee Type', 'Notes'
+            ]
+            
+            st.download_button(
+                label="📥 Download Quick Wins Report (Excel)",
+                data=export_df.to_csv(index=False).encode('utf-8-sig'),
+                file_name="quick_wins_report.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
     
     # === TREND ANALYSIS ===
     elif page == "📊 Trend Analysis":

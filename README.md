@@ -75,6 +75,8 @@ Your command center for high-level insights.
 **What you see:**
 - Total services, requests, and current revenue
 - Fee coverage percentage
+- **NEW:** Services with suggested fees and untapped revenue potential
+- **NEW:** High confidence suggestions and quick wins available
 - Year-over-year growth trends
 - Top 10 services by volume
 - Category distribution charts
@@ -82,6 +84,7 @@ Your command center for high-level insights.
 **How to use:**
 - Start here to understand the current state
 - Check KPI cards for quick metrics
+- **NEW:** View untapped revenue from documented fee suggestions
 - Review trends to see growth patterns
 - Identify which categories dominate requests
 
@@ -89,9 +92,16 @@ Your command center for high-level insights.
 
 ---
 
-### 2. 🎯 **Revenue Simulator**
+### 2. 🎯 **Revenue Simulator** (Enhanced)
 
 Test "what-if" scenarios before implementing changes.
+
+**NEW: Suggested Fee Integration**
+- When selecting a service, if a fee suggestion exists, it's automatically shown
+- View suggested fee amount, type, and confidence score
+- See full suggestion details from notes
+- One-click "Use Suggested Fee" button pre-populates the slider
+- Makes it easy to test documented recommendations
 
 #### **Mode 1: Single Service**
 
@@ -164,7 +174,88 @@ Top Opportunity: تجديد ترخيص عمل عام
 
 ---
 
-### 4. 📊 **Trend Analysis & Forecasting**
+### 4. 💡 **Quick Wins with Suggested Fees** ✨ NEW
+
+Discover high-impact opportunities with **documented fee suggestions** from operational data.
+
+**What makes this different:**
+- Uses **actual fee suggestions** extracted from the notes column
+- Parses Arabic text to identify specific fee recommendations
+- Shows different fee structures (flat, per-person, per-month, tiered, conditional)
+- Includes confidence scores for each suggestion
+- Displays special conditions (government vs private pricing, etc.)
+
+**Key Features:**
+
+#### **KPI Dashboard**
+- Services with suggestions count and percentage
+- Total untapped revenue potential
+- Quick wins count (high volume + no fee + has suggestion)
+- High confidence suggestions available
+
+#### **Top Quick Wins Table**
+Each quick win shows:
+- Service name and category
+- Current fee vs suggested fee
+- Total requests and revenue potential
+- Fee structure type (e.g., "per person", "per month")
+- Confidence score
+- **Full original suggestion text** from notes
+- Special conditions if any
+
+**Example Quick Win:**
+```
+Service: تغيير جهة عمل (داخل سوق العمل القطري)
+- Requests: 305,575
+- Current Fee: 0 QAR
+- Suggested Fee: 100 QAR (conditional)
+- Fee Type: Conditional (for private companies)
+- Potential Revenue: 30,557,500 QAR
+- Confidence: 80%
+- Note: "مئة ريال في حال الجهة الجديدة شركة خاصة"
+```
+
+#### **Visualizations**
+1. **Revenue Gap Waterfall** - Shows cumulative revenue potential
+2. **Current vs Suggested Fees** - Side-by-side bar chart comparison
+3. **Fee Structure Distribution** - Pie chart of suggestion types
+
+#### **Batch Actions**
+One-click implementation of multiple suggestions:
+- **Apply Top 5 Suggestions** - Implement the 5 highest-impact suggestions
+- **Conservative (50%)** - Apply 50% of all suggested fees
+- **Aggressive (100%)** - Apply 100% of all suggested fees
+
+Each batch action creates a scenario you can review across all dashboard sections.
+
+#### **Export Functionality**
+Download complete quick wins report as CSV including:
+- Service details
+- Current and suggested fees
+- Revenue calculations
+- Fee structure types
+- Original suggestion notes
+
+**Real Impact Example:**
+From analyzing the data, top 4 quick wins alone offer **~53 Million QAR** potential:
+1. تغيير جهة عمل (305K requests) → 100 QAR = 30.5M QAR
+2. تعديل موافقة استقدام (225K requests) → 3 QAR = 675K QAR
+3. طلب عمل إعارة (213K requests) → 100 QAR = 21.3M QAR
+4. اصدار موافقة استقدام (189K requests) → 2-5 QAR = 378K-945K QAR
+
+**How to Use:**
+1. Review KPIs to see total opportunity size
+2. Adjust minimum volume threshold to filter results
+3. Expand each service to see full details and original suggestion
+4. Click "Apply to Simulator" to test individual suggestions
+5. Use batch actions to implement multiple suggestions at once
+6. Export report for stakeholder review
+
+**Best for:** Making data-driven decisions based on documented operational knowledge
+
+---
+
+### 5. 📊 **Trend Analysis & Forecasting**
 
 Understand historical patterns and predict future demand.
 
@@ -425,9 +516,30 @@ Required columns:
 | 2025 | Number | Requests in 2025 |
 | اجمالي العدد | Number | Total requests |
 | الرسوم الحالية | Text | Current fees (can be "لا يوجد" or number) |
-| ملاحظات و مقترح الرسوم | Text | Notes and suggested fees |
+| ملاحظات و مقترح الرسوم | Text | **Notes and suggested fees** ⭐ NEW |
 
 **Empty cells:** Treated as zero requests (no data for that year)
+
+#### **✨ NEW: Enhanced Notes Column (ملاحظات و مقترح الرسوم)**
+
+This column now powers the Quick Wins feature by automatically parsing Arabic text to extract:
+
+**Supported fee structures:**
+- **Flat fees:** "مئة ريال" → 100 QAR
+- **Per-person pricing:** "عشرة ريال عن كل شخص" → 10 QAR per person
+- **Per-month pricing:** "مئة ريال عن كل شهر" → 100 QAR per month
+- **Per-modification:** "ثلاث ريال عن كل تعديل" → 3 QAR per modification
+- **Tiered pricing:** "خمسة ريال لكل مهنة تخصصية, اثنين ريال لكل مهنة غير تخصصية" → 5/2 QAR
+- **Conditional pricing:** "مئة ريال في حال الجهة الجديدة شركة خاصة" → 100 QAR for private companies
+
+**Historical changes:**
+- Detects phrases like "كانت 500 و تم تعديل القيمة الى 100" to track fee evolution
+- Useful for understanding past pricing decisions and their impacts
+
+**Special conditions:**
+- Automatically identifies government vs private pricing
+- Flags services for specific entity types
+- Notes disciplinary vs regular pricing variations
 
 ### **Updating Data**
 

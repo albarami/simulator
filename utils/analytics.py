@@ -3,7 +3,7 @@ Analytics and calculations module for Ministry of Labour dashboard.
 """
 import pandas as pd
 import numpy as np
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from sklearn.linear_model import LinearRegression
 
 
@@ -299,4 +299,270 @@ def get_service_quadrant(df: pd.DataFrame) -> pd.DataFrame:
     df_copy['Quadrant'] = df_copy.apply(assign_quadrant, axis=1)
     
     return df_copy
+
+
+def analyze_suggested_fees(df: pd.DataFrame) -> Dict[str, Any]:
+    """
+    Comprehensive analysis of suggested fees from notes column.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe with parsed suggestion fields.
+        
+    Returns:
+        dict: Analysis results including totals, breakdowns, and opportunities.
+    """
+    # Filter services with suggestions
+    has_suggestions = df[df['Suggested_Fee_Numeric'] > 0].copy()
+    
+    # Calculate totals
+    total_services_with_suggestions = len(has_suggestions)
+    total_potential_revenue = has_suggestions['Suggested_Revenue_Potential'].sum()
+    total_current_revenue = has_suggestions['Current_Annual_Revenue'].sum()
+    total_revenue_gap = has_suggestions['Revenue_Gap'].sum()
+    
+    # Breakdown by fee structure type
+    fee_type_breakdown = has_suggestions.groupby('Fee_Structure_Type').agg({
+        'اسم الخدمة': 'count',
+        'Revenue_Gap': 'sum',
+        'اجمالي العدد': 'sum'
+    }).reset_index()
+    fee_type_breakdown.columns = ['Fee_Type', 'Service_Count', 'Potential_Revenue', 'Total_Requests']
+    
+    # Services without fees but with suggestions (quick wins)
+    quick_wins = has_suggestions[has_suggestions['Current_Fee_Numeric'] == 0].copy()
+    quick_wins_count = len(quick_wins)
+    quick_wins_potential = quick_wins['Suggested_Revenue_Potential'].sum()
+    
+    # High confidence suggestions
+    high_confidence = has_suggestions[has_suggestions['Fee_Suggestion_Confidence'] >= 0.8]
+    high_confidence_count = len(high_confidence)
+    high_confidence_potential = high_confidence['Revenue_Gap'].sum()
+    
+    # Average metrics
+    avg_suggested_fee = has_suggestions['Suggested_Fee_Numeric'].mean()
+    avg_revenue_gain = has_suggestions['Revenue_Gap'].mean()
+    
+    return {
+        'total_services_with_suggestions': total_services_with_suggestions,
+        'total_potential_revenue': total_potential_revenue,
+        'total_current_revenue': total_current_revenue,
+        'total_revenue_gap': total_revenue_gap,
+        'fee_type_breakdown': fee_type_breakdown,
+        'quick_wins_count': quick_wins_count,
+        'quick_wins_potential': quick_wins_potential,
+        'high_confidence_count': high_confidence_count,
+        'high_confidence_potential': high_confidence_potential,
+        'avg_suggested_fee': avg_suggested_fee,
+        'avg_revenue_gain': avg_revenue_gain
+    }
+
+
+def identify_quick_wins(
+    df: pd.DataFrame, 
+    min_requests: int = 10000, 
+    top_n: int = 10
+) -> pd.DataFrame:
+    """
+    Identify high-impact opportunities with actual suggestions from notes.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe with suggestion fields.
+        min_requests (int): Minimum request volume to consider.
+        top_n (int): Number of top opportunities to return.
+        
+    Returns:
+        pd.DataFrame: Top quick win opportunities with suggestions.
+    """
+    # Filter criteria:
+    # 1. Has a suggested fee (parsed from notes)
+    # 2. Currently has no fee or very low fee
+    # 3. High volume (above min_requests)
+    quick_wins = df[
+        (df['Suggested_Fee_Numeric'] > 0) &
+        (df['Current_Fee_Numeric'] <= 20) &
+        (df['اجمالي العدد'] >= min_requests)
+    ].copy()
+    
+    # Sort by revenue gap (potential gain)
+    quick_wins = quick_wins.sort_values('Revenue_Gap', ascending=False)
+    
+    # Select relevant columns
+    result = quick_wins[[
+        'اسم الخدمة',
+        'Category',
+        'اجمالي العدد',
+        'Current_Fee_Numeric',
+        'Suggested_Fee_Numeric',
+        'Revenue_Gap',
+        'Suggested_Revenue_Potential',
+        'Fee_Structure_Type',
+        'Fee_Suggestion_Confidence',
+        'Special_Conditions',
+        'ملاحظات و مقترح الرسوم'
+    ]].head(top_n)
+    
+    return result
+
+
+def calculate_suggestion_implementation_impact(
+    df: pd.DataFrame, 
+    services_to_implement: List[str]
+) -> Dict[str, Any]:
+    """
+    Calculate the impact of implementing specific suggested fees.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        services_to_implement (list): List of service names to implement suggestions for.
+        
+    Returns:
+        dict: Implementation impact metrics.
+    """
+    # Filter to selected services
+    selected = df[df['اسم الخدمة'].isin(services_to_implement)].copy()
+    
+    # Calculate totals
+    total_services = len(selected)
+    total_revenue_increase = selected['Revenue_Gap'].sum()
+    total_new_revenue = selected['Suggested_Revenue_Potential'].sum()
+    total_current_revenue = selected['Current_Annual_Revenue'].sum()
+    total_requests_affected = selected['اجمالي العدد'].sum()
+    
+    # Calculate percentage increase
+    if total_current_revenue > 0:
+        percent_increase = (total_revenue_increase / total_current_revenue) * 100
+    else:
+        percent_increase = 100.0 if total_new_revenue > 0 else 0.0
+    
+    # Breakdown by fee structure type
+    fee_structure_breakdown = selected.groupby('Fee_Structure_Type').agg({
+        'اسم الخدمة': 'count',
+        'Revenue_Gap': 'sum'
+    }).reset_index()
+    
+    # Services detail
+    services_detail = selected[[
+        'اسم الخدمة',
+        'Current_Fee_Numeric',
+        'Suggested_Fee_Numeric',
+        'اجمالي العدد',
+        'Revenue_Gap',
+        'Fee_Structure_Type'
+    ]].to_dict('records')
+    
+    return {
+        'total_services': total_services,
+        'total_revenue_increase': total_revenue_increase,
+        'total_new_revenue': total_new_revenue,
+        'total_current_revenue': total_current_revenue,
+        'percent_increase': percent_increase,
+        'total_requests_affected': total_requests_affected,
+        'fee_structure_breakdown': fee_structure_breakdown,
+        'services_detail': services_detail
+    }
+
+
+def compare_current_vs_suggested(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create side-by-side comparison of current vs suggested fees.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        
+    Returns:
+        pd.DataFrame: Comparison dataframe.
+    """
+    # Filter services with suggestions
+    comparison = df[df['Suggested_Fee_Numeric'] > 0].copy()
+    
+    # Select relevant columns
+    result = comparison[[
+        'اسم الخدمة',
+        'Category',
+        'اجمالي العدد',
+        'Current_Fee_Numeric',
+        'Suggested_Fee_Numeric',
+        'Current_Annual_Revenue',
+        'Suggested_Revenue_Potential',
+        'Revenue_Gap',
+        'Fee_Structure_Type',
+        'Fee_Suggestion_Confidence'
+    ]].sort_values('Revenue_Gap', ascending=False)
+    
+    # Add comparison metrics
+    result['Fee_Change_Pct'] = ((result['Suggested_Fee_Numeric'] - result['Current_Fee_Numeric']) / 
+                                 result['Current_Fee_Numeric'].replace(0, 1)) * 100
+    
+    result['Revenue_Change_Pct'] = ((result['Revenue_Gap'] / 
+                                      result['Current_Annual_Revenue'].replace(0, 1)) * 100)
+    
+    return result
+
+
+def analyze_historical_fee_impacts(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Analyze historical fee changes to understand demand elasticity.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe with historical change fields.
+        
+    Returns:
+        pd.DataFrame: Analysis of historical fee changes and their impacts.
+    """
+    # Filter services with historical changes
+    historical = df[df['Has_Historical_Change'] == True].copy()
+    
+    if len(historical) == 0:
+        return pd.DataFrame()
+    
+    # Calculate fee change metrics
+    historical['Fee_Change_Amount'] = (
+        historical['Historical_New_Fee'] - historical['Historical_Original_Fee']
+    )
+    
+    historical['Fee_Change_Pct'] = (
+        (historical['Fee_Change_Amount'] / historical['Historical_Original_Fee'].replace(0, 1)) * 100
+    )
+    
+    # Try to estimate impact on demand (simplified - would need more historical data)
+    # For now, just show the changes
+    result = historical[[
+        'اسم الخدمة',
+        'Historical_Original_Fee',
+        'Historical_New_Fee',
+        'Fee_Change_Amount',
+        'Fee_Change_Pct',
+        'Historical_Change_Date',
+        'Current_Fee_Numeric',
+        'اجمالي العدد'
+    ]].copy()
+    
+    return result
+
+
+def segment_based_revenue_analysis(df: pd.DataFrame) -> Dict[str, Any]:
+    """
+    Analyze revenue potential by segment (government vs private).
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        
+    Returns:
+        dict: Segment-based analysis.
+    """
+    # Identify services with segment-specific pricing
+    government_services = df[df['Special_Conditions'].str.contains('government', case=False, na=False)].copy()
+    private_services = df[df['Special_Conditions'].str.contains('private', case=False, na=False)].copy()
+    conditional_services = df[df['Fee_Structure_Type'] == 'conditional'].copy()
+    
+    analysis = {
+        'government_only_count': len(government_services),
+        'government_only_revenue': government_services['Current_Annual_Revenue'].sum(),
+        'private_only_count': len(private_services),
+        'private_only_revenue': private_services['Suggested_Revenue_Potential'].sum(),
+        'conditional_pricing_count': len(conditional_services),
+        'conditional_pricing_potential': conditional_services['Revenue_Gap'].sum()
+    }
+    
+    return analysis
 

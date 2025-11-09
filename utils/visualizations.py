@@ -437,3 +437,299 @@ def plot_opportunities_chart(opportunities_df: pd.DataFrame) -> go.Figure:
     
     return fig
 
+
+def plot_current_vs_suggested_fees(df: pd.DataFrame, top_n: int = 10) -> go.Figure:
+    """
+    Create a grouped bar chart comparing current and suggested fees.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe with suggestion fields.
+        top_n (int): Number of services to show.
+        
+    Returns:
+        plotly.graph_objects.Figure: Comparison bar chart.
+    """
+    # Filter services with suggestions and sort by revenue gap
+    comparison_df = df[df['Suggested_Fee_Numeric'] > 0].copy()
+    comparison_df = comparison_df.sort_values('Revenue_Gap', ascending=False).head(top_n)
+    
+    fig = go.Figure()
+    
+    # Add current fees
+    fig.add_trace(go.Bar(
+        name='Current Fee',
+        x=comparison_df['اسم الخدمة'],
+        y=comparison_df['Current_Fee_Numeric'],
+        marker=dict(color='#ff6b6b'),
+        text=comparison_df['Current_Fee_Numeric'].apply(lambda x: f"{x:.0f}"),
+        textposition='outside'
+    ))
+    
+    # Add suggested fees
+    fig.add_trace(go.Bar(
+        name='Suggested Fee',
+        x=comparison_df['اسم الخدمة'],
+        y=comparison_df['Suggested_Fee_Numeric'],
+        marker=dict(color='#51cf66'),
+        text=comparison_df['Suggested_Fee_Numeric'].apply(lambda x: f"{x:.0f}"),
+        textposition='outside'
+    ))
+    
+    fig.update_layout(
+        title=f'Current vs Suggested Fees - Top {top_n} Opportunities',
+        xaxis_title='Service',
+        yaxis_title='Fee (QAR)',
+        barmode='group',
+        template='plotly_white',
+        height=500,
+        xaxis={'tickangle': -45},
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+    )
+    
+    return fig
+
+
+def plot_quick_wins_dashboard(quick_wins_df: pd.DataFrame) -> go.Figure:
+    """
+    Create a bubble chart visualization for quick wins.
+    
+    Args:
+        quick_wins_df (pd.DataFrame): Quick wins dataframe from identify_quick_wins.
+        
+    Returns:
+        plotly.graph_objects.Figure: Bubble chart.
+    """
+    fig = px.scatter(
+        quick_wins_df,
+        x='Current_Fee_Numeric',
+        y='Suggested_Fee_Numeric',
+        size='اجمالي العدد',
+        color='Revenue_Gap',
+        hover_data=['اسم الخدمة', 'Fee_Structure_Type'],
+        color_continuous_scale='Reds',
+        size_max=60
+    )
+    
+    # Add diagonal line (y=x) to show where current = suggested
+    max_fee = max(quick_wins_df['Suggested_Fee_Numeric'].max(), 
+                   quick_wins_df['Current_Fee_Numeric'].max())
+    fig.add_trace(go.Scatter(
+        x=[0, max_fee],
+        y=[0, max_fee],
+        mode='lines',
+        line=dict(dash='dash', color='gray', width=1),
+        showlegend=False,
+        hoverinfo='skip'
+    ))
+    
+    fig.update_layout(
+        title='Quick Wins Analysis: Current vs Suggested Fees',
+        xaxis_title='Current Fee (QAR)',
+        yaxis_title='Suggested Fee (QAR)',
+        template='plotly_white',
+        height=500
+    )
+    
+    return fig
+
+
+def plot_revenue_gap_waterfall(df: pd.DataFrame, top_n: int = 10) -> go.Figure:
+    """
+    Create a waterfall chart showing revenue opportunities from suggestions.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        top_n (int): Number of top opportunities to show.
+        
+    Returns:
+        plotly.graph_objects.Figure: Waterfall chart.
+    """
+    # Get top services by revenue gap
+    top_services = df[df['Revenue_Gap'] > 0].nlargest(top_n, 'Revenue_Gap').copy()
+    
+    # Prepare data for waterfall
+    services = top_services['اسم الخدمة'].tolist()
+    gaps = top_services['Revenue_Gap'].tolist()
+    
+    # Add total
+    services.append('Total Potential')
+    gaps.append(sum(gaps))
+    
+    # Create waterfall
+    fig = go.Figure(go.Waterfall(
+        name='Revenue Gap',
+        orientation='v',
+        measure=['relative'] * top_n + ['total'],
+        x=services,
+        y=gaps,
+        text=[f"{g:,.0f}" for g in gaps],
+        textposition='outside',
+        connector={'line': {'color': 'rgb(63, 63, 63)'}},
+        increasing={'marker': {'color': '#51cf66'}},
+        totals={'marker': {'color': '#667eea'}}
+    ))
+    
+    fig.update_layout(
+        title=f'Revenue Opportunity Waterfall - Top {top_n} Services',
+        xaxis_title='Service',
+        yaxis_title='Revenue Gain (QAR)',
+        template='plotly_white',
+        height=500,
+        xaxis={'tickangle': -45}
+    )
+    
+    return fig
+
+
+def plot_fee_structure_distribution(df: pd.DataFrame) -> go.Figure:
+    """
+    Create a pie chart showing distribution of fee structure types.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        
+    Returns:
+        plotly.graph_objects.Figure: Pie chart.
+    """
+    # Filter services with suggestions
+    suggestions_df = df[df['Suggested_Fee_Numeric'] > 0].copy()
+    
+    # Count by fee structure type
+    structure_counts = suggestions_df['Fee_Structure_Type'].value_counts()
+    
+    fig = go.Figure(go.Pie(
+        labels=structure_counts.index,
+        values=structure_counts.values,
+        hole=0.4,
+        marker=dict(colors=px.colors.qualitative.Set2)
+    ))
+    
+    fig.update_layout(
+        title='Distribution of Suggested Fee Structures',
+        template='plotly_white',
+        height=400
+    )
+    
+    return fig
+
+
+def plot_historical_fee_timeline(df: pd.DataFrame) -> go.Figure:
+    """
+    Create a timeline showing historical fee changes.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        
+    Returns:
+        plotly.graph_objects.Figure: Timeline chart.
+    """
+    # Filter services with historical changes
+    historical_df = df[df['Has_Historical_Change'] == True].copy()
+    
+    if len(historical_df) == 0:
+        # Return empty chart with message
+        fig = go.Figure()
+        fig.add_annotation(
+            text="No historical fee changes found in data",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=0.5,
+            showarrow=False,
+            font=dict(size=14)
+        )
+        fig.update_layout(
+            title='Historical Fee Changes Timeline',
+            template='plotly_white',
+            height=400
+        )
+        return fig
+    
+    fig = go.Figure()
+    
+    for idx, row in historical_df.iterrows():
+        service_name = row['اسم الخدمة'][:30] + '...'
+        
+        # Add line showing fee change
+        fig.add_trace(go.Scatter(
+            x=['Original', 'Changed'],
+            y=[row['Historical_Original_Fee'], row['Historical_New_Fee']],
+            mode='lines+markers',
+            name=service_name,
+            line=dict(width=2),
+            marker=dict(size=10)
+        ))
+    
+    fig.update_layout(
+        title='Historical Fee Changes',
+        xaxis_title='',
+        yaxis_title='Fee (QAR)',
+        template='plotly_white',
+        height=500,
+        hovermode='closest'
+    )
+    
+    return fig
+
+
+def plot_suggestion_implementation_roadmap(df: pd.DataFrame, priority_services: List[str]) -> go.Figure:
+    """
+    Create a priority matrix for implementing suggestions.
+    
+    Args:
+        df (pd.DataFrame): Services dataframe.
+        priority_services (list): List of service names in priority order.
+        
+    Returns:
+        plotly.graph_objects.Figure: Priority matrix/roadmap.
+    """
+    # Filter to priority services
+    roadmap_df = df[df['اسم الخدمة'].isin(priority_services)].copy()
+    
+    # Calculate implementation ease score (inverse of complexity)
+    # Simple heuristic: flat fees are easier than complex structures
+    ease_scores = {
+        'flat': 5,
+        'per_person': 4,
+        'per_month': 4,
+        'per_modification': 3,
+        'tiered': 2,
+        'conditional': 2,
+        'none': 0
+    }
+    
+    roadmap_df['Implementation_Ease'] = roadmap_df['Fee_Structure_Type'].map(ease_scores)
+    roadmap_df['Revenue_Impact'] = roadmap_df['Revenue_Gap'] / 1000  # Scale for visualization
+    
+    fig = px.scatter(
+        roadmap_df,
+        x='Implementation_Ease',
+        y='Revenue_Impact',
+        size='اجمالي العدد',
+        color='Fee_Structure_Type',
+        hover_data=['اسم الخدمة', 'Suggested_Fee_Numeric'],
+        text='اسم الخدمة'
+    )
+    
+    # Add quadrant lines
+    avg_ease = roadmap_df['Implementation_Ease'].mean()
+    avg_impact = roadmap_df['Revenue_Impact'].mean()
+    
+    fig.add_hline(y=avg_impact, line_dash="dash", line_color="gray", opacity=0.5)
+    fig.add_vline(x=avg_ease, line_dash="dash", line_color="gray", opacity=0.5)
+    
+    # Add quadrant labels
+    fig.add_annotation(x=4.5, y=roadmap_df['Revenue_Impact'].max() * 0.9,
+                       text="Quick Wins", showarrow=False, font=dict(size=12, color="green"))
+    fig.add_annotation(x=1.5, y=roadmap_df['Revenue_Impact'].max() * 0.9,
+                       text="Major Projects", showarrow=False, font=dict(size=12, color="orange"))
+    
+    fig.update_layout(
+        title='Suggestion Implementation Priority Matrix',
+        xaxis_title='Implementation Ease (Higher = Easier)',
+        yaxis_title='Revenue Impact (thousands QAR)',
+        template='plotly_white',
+        height=500
+    )
+    
+    return fig
