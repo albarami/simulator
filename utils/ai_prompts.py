@@ -71,14 +71,29 @@ Be formal, data-driven, and strategic."""
 
 كن موجزاً ومهنياً ومفيداً. ركز على الدقة قبل كل شيء.""",
         
-        "insights": """أنت محلل بيانات متخصص في تحسين رسوم الخدمات الحكومية.
-قم بتحليل البيانات المقدمة وإنشاء 3-5 رؤى رئيسية تكون:
-- قابلة للتنفيذ ومحددة
-- مدعومة بالبيانات
-- استراتيجية وذات تأثير كبير
-- سهلة الفهم
+        "insights": """أنت مستشار أول لتحسين الإيرادات في القطاع العام بخبرة 15+ عاماً في دول مجلس التعاون الخليجي.
 
-قدم النتائج كنقاط مع توصيات واضحة.""",
+قم بإنشاء رؤى استراتيجية بهذا التنسيق:
+
+**الهيكل:**
+1. ابدأ بملخص تنفيذي (3-4 نقاط، سطر واحد لكل نقطة)
+2. ثم قدم 4-6 رؤى تفصيلية
+
+**كل رؤية يجب أن:**
+1. تشير إلى المقترحات الموثقة الفعلية (النص العربي المحدد ومبالغ الريال القطري)
+2. تشمل تحذيرات الافتراضات: "(بافتراض متوسط X أشهر - تحقق من البيانات التاريخية)"
+3. تستخدم أطر زمنية نسبية: "المرحلة 1 (الأشهر 1-3)" بدلاً من تواريخ محددة
+4. تقييم المخاطر المحدد: "مرونة الطلب: <5٪" أو "الحساسية السياسية: متوسطة"
+
+**التنسيق:**
+- عنوان بخط عريض (جملة واحدة)
+- 2-3 جمل مع اسم الخدمة بالعربية، المبالغ الدقيقة، حساب الإيرادات
+- الإجراء الموصى به: [خطوة محددة مع توقيت المرحلة]
+
+**الإيجاز:** 
+- الملخص التنفيذي: 4 نقاط كحد أقصى
+- كل رؤية: 4-5 جمل كحد أقصى
+- المجموع: ~600-800 كلمة""",
         
         "report": """أنت مستشار أول يعد تقريراً تنفيذياً لقيادة وزارة العمل.
 أنشئ تقريراً شاملاً واحترافياً يتضمن:
@@ -163,18 +178,33 @@ TOP 10 SERVICES BY REQUEST VOLUME:
 {top_10_services}
 
 YOUR TASK:
-Generate 4-6 strategic insights that MUST:
+Generate 4-6 strategic insights in this EXACT format:
 
-1. **Reference ACTUAL documented suggestions** - Don't make up generic fees, cite the specific Arabic suggestions and their QAR amounts
-2. **Prioritize by revenue impact** - Lead with the highest-impact documented opportunities (e.g., services with 100K+ requests and specific fee suggestions)
-3. **Assess implementation feasibility** - Distinguish between employer-paid (easy) vs employee-paid (sensitive) services
-4. **Recognize fee structure sophistication** - Note where conditional pricing (government vs private) or tiered pricing exists
-5. **Leverage historical data** - If historical fee changes exist in the data, reference them for demand elasticity insights
-6. **Be actionable** - Provide specific next steps: "Implement the documented 100 QAR fee for [Arabic service name] affecting 305K requests = 30.5M QAR"
+**STRUCTURE:**
+1. Start with 3-4 bullet "Executive Summary" of key findings (one line each)
+2. Then provide 4-6 detailed insights
 
-Format: Start each insight with a bold statement, then provide 2-3 sentences with specific service names (in Arabic with English translation), exact QAR amounts from suggestions, and estimated revenue impact. End with a concrete action step.
+**EACH INSIGHT MUST:**
 
-THINK LIKE: A consultant who has thoroughly reviewed all operational documents and is presenting findings to the Minister of Labour.""",
+1. **Reference ACTUAL documented suggestions** - Cite specific Arabic text and exact QAR amounts from operational data
+2. **Prioritize by revenue impact** - Lead with highest-impact documented opportunities
+3. **Assess implementation feasibility** - Distinguish employer-paid (low risk) vs employee-paid (politically sensitive)
+4. **Recognize fee structure sophistication** - Note conditional pricing (gov't vs private), tiered rates, per-person/per-month structures
+5. **Include assumption caveats** - When assuming durations or elasticity, explicitly state: "(Assumes X-month average duration - verify with historical data)" or "(Estimated Y% demand drop - monitor in pilot phase)"
+6. **Use RELATIVE timeframes** - Say "Phase 1 (Months 1-3)", "Phase 2 (Months 4-6)", "Phase 3 (Months 7-12)" instead of specific quarters/years
+
+**FORMAT FOR EACH INSIGHT:**
+- Bold insight header (one sentence)
+- 2-3 sentences with Arabic service name + English translation, exact QAR amounts, revenue calculation
+- Risk assessment: "Demand elasticity: <5%" or "Political sensitivity: Medium"
+- Action step: "RECOMMENDED ACTION: [specific next step with phase timing]"
+
+**KEEP IT CONCISE:** 
+- Executive summary: 4 bullets max
+- Each detailed insight: 4-5 sentences max
+- Total response: ~600-800 words
+
+THINK LIKE: A consultant presenting slide deck to the Minister - start with executive summary, then supporting details.""",
 
     "opportunities": """As a GCC Public Sector Revenue Expert, analyze these documented revenue opportunities from Qatar Ministry of Labour operational data:
 
@@ -206,19 +236,39 @@ CRITICAL ANALYSIS FRAMEWORK:
    - Tiered pricing (specialized vs non-specialized professions) reflects cost-to-serve differences
 
 YOUR TASK:
-Provide 5-6 strategic insights that:
+Generate strategic insights in this format:
 
-1. **Validate or question the documented suggestions** - If operations team suggests 100 QAR for a 305K request service, explain why this is brilliant OR why it might face resistance
-2. **Rank by implementation sequence** - Which services to implement first, second, third and exactly why (consider: revenue size, demand elasticity, political sensitivity, operational readiness)
-3. **Assess risk specifically** - For each major opportunity, state: "Demand drop risk: <5%" or "Demand drop risk: 10-15%" with reasoning
-4. **Leverage fee structure sophistication** - Highlight where conditional/tiered pricing creates win-win outcomes
-5. **Provide tactical next steps** - "Week 1-2: Stakeholder consultations with employer associations on [service]. Week 3-4: Soft launch with 30-day notice..."
+**STRUCTURE:**
+1. Start with 3-4 bullet executive summary highlighting top opportunities and total potential
+2. Then provide 4-5 detailed insights
 
-Format: Bold insight headers, 3-4 sentence analysis with specific Arabic service names + English translations, exact documented QAR amounts, revenue calculations, and risk assessment. End each insight with "RECOMMENDED ACTION: [specific step]"
+**EACH INSIGHT MUST:**
 
-Total Potential from Suggestions: {total_potential:,.0f} QAR
+1. **Validate documented suggestions** - Reference specific Arabic text and explain why the suggested QAR amount is appropriate or needs adjustment
+2. **Rank implementation sequence** - State which phase (Months 1-3, 4-6, 7-12) and why
+3. **Include assumption caveats** - State any assumptions: "(Assumes X% demand elasticity - pilot test recommended)" or "(Assumes Y-month average - verify with operational data)"
+4. **Assess specific risks** - State exact risk levels: "Demand elasticity: <5%" or "Political sensitivity: High (worker-paid fee)"
+5. **Use relative timeframes** - "Phase 1 (Months 1-3): [action]" instead of specific dates
+6. **Provide tactical milestones** - "Months 1-2: Stakeholder consultation. Months 3-4: System configuration. Month 5: Launch."
 
-THINK LIKE: A consultant presenting to the Director General, referencing the operational team's documented recommendations and providing expert validation + implementation roadmap.""",
+**FORMAT:**
+- **Bold one-sentence insight header**
+- Arabic service name (English translation): X requests × Y QAR = Z revenue
+- Fee structure type and why it's smart/problematic
+- Risk assessment with specific percentage or level
+- RECOMMENDED ACTION: [Phase + specific tactical steps]
+
+**KEEP IT CONCISE:**
+- Executive summary: 3-4 bullets, one line each
+- Each insight: 4-5 sentences maximum
+- Total: ~600-800 words
+
+**REVENUE CAVEAT:**
+When projecting revenue for recurring fees (per-month, per-year), include caveat: "(Projected based on X-period average - actual revenue depends on duration patterns)"
+
+Total Documented Potential: {total_potential:,.0f} QAR
+
+THINK LIKE: Consultant validating operational team's proposals with expert analysis and phased implementation roadmap.""",
 
     "simulator": """A user is testing this fee change:
 
