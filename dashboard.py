@@ -403,8 +403,25 @@ def main():
             
             try:
                 with st.spinner("🤔 Analyzing data..."):
-                    # Prepare data for insights
+                    # Prepare comprehensive data for insights including ACTUAL suggestions
                     top_service = df.nlargest(1, 'اجمالي العدد').iloc[0]
+                    
+                    # Get top 10 services with their suggestions
+                    top_10 = df.nlargest(10, 'اجمالي العدد')
+                    top_10_text = []
+                    for idx, row in top_10.iterrows():
+                        suggestion_info = ""
+                        if row['Suggested_Fee_Numeric'] > 0:
+                            suggestion_info = f" | SUGGESTED: {row['Suggested_Fee_Numeric']:.0f} QAR ({row['Fee_Structure_Type']}) - Potential: {row['Revenue_Gap']:,.0f} QAR"
+                            if pd.notna(row['ملاحظات و مقترح الرسوم']):
+                                suggestion_info += f' - Note: "{row["ملاحظات و مقترح الرسوم"][:80]}..."'
+                        
+                        top_10_text.append(
+                            f"{row['اسم الخدمة']}: {int(row['اجمالي العدد']):,} requests, "
+                            f"Current Fee: {row['Current_Fee_Numeric']:.0f} QAR, "
+                            f"Revenue: {row['Current_Annual_Revenue']:,.0f} QAR{suggestion_info}"
+                        )
+                    
                     insight_data = {
                         "total_services": summary['total_services'],
                         "total_requests": summary['total_requests'],
@@ -412,10 +429,15 @@ def main():
                         "no_fee_pct": (summary['services_without_fees'] / summary['total_services'] * 100),
                         "current_revenue": summary['current_total_revenue'],
                         "top_service": top_service['اسم الخدمة'],
-                        "top_requests": int(top_service['اجمالي العدد'])
+                        "top_requests": int(top_service['اجمالي العدد']),
+                        "top_10_services": "\n".join(top_10_text),
+                        "services_with_suggestions": suggestions_analysis['total_services_with_suggestions'],
+                        "untapped_revenue": suggestions_analysis['total_revenue_gap'],
+                        "high_confidence_suggestions": suggestions_analysis['high_confidence_count'],
+                        "quick_wins_count": suggestions_analysis['quick_wins_count']
                     }
                     
-                    # Generate insights
+                    # Generate insights with enhanced context
                     insights = ai.generate_insights(
                         insight_data,
                         insight_type="executive_summary",
@@ -772,26 +794,35 @@ def main():
             
             st.plotly_chart(plot_opportunities_chart(opportunities), use_container_width=True)
         
-        # AI Insights for Opportunities
+        # AI Insights for Opportunities - Using ACTUAL documented suggestions
         if ai and ai.is_available():
             st.subheader("🤖 AI Strategic Analysis")
             
             try:
                 with st.spinner("🤔 Analyzing opportunities..."):
-                    # Prepare opportunities data
+                    # Get ACTUAL documented suggestions (not generic slider fee)
+                    quick_wins_for_analysis = identify_quick_wins(df, min_requests=10000, top_n=10)
+                    
+                    # Prepare detailed opportunities data with ACTUAL suggestions
                     opps_summary = []
-                    for _, row in opportunities.head(5).iterrows():
-                        opps_summary.append(
-                            f"- {row['اسم الخدمة']}: {int(row['اجمالي العدد']):,} requests → {row['Revenue_Gain']:,.0f} QAR potential"
-                        )
+                    for _, row in quick_wins_for_analysis.head(5).iterrows():
+                        suggestion_detail = f"- {row['اسم الخدمة']} (Job Transfer/Permit): {int(row['اجمالي العدد']):,} requests"
+                        suggestion_detail += f"\n  Current Fee: {row['Current_Fee_Numeric']:.0f} QAR"
+                        suggestion_detail += f"\n  DOCUMENTED SUGGESTION: {row['Suggested_Fee_Numeric']:.0f} QAR ({row['Fee_Structure_Type']})"
+                        suggestion_detail += f"\n  Revenue Potential: {row['Revenue_Gap']:,.0f} QAR"
+                        if pd.notna(row['ملاحظات و مقترح الرسوم']):
+                            suggestion_detail += f'\n  Original Note: "{row["ملاحظات و مقترح الرسوم"][:100]}..."'
+                        if row['Special_Conditions']:
+                            suggestion_detail += f"\n  Conditions: {row['Special_Conditions']}"
+                        opps_summary.append(suggestion_detail)
                     
                     insight_data = {
-                        "opportunities_data": "\n".join(opps_summary),
+                        "opportunities_data": "\n\n".join(opps_summary) if len(opps_summary) > 0 else "No documented suggestions available in top services.",
                         "suggested_fee": suggested_fee,
-                        "total_potential": opportunities['Revenue_Gain'].sum()
+                        "total_potential": quick_wins_for_analysis['Revenue_Gap'].sum() if len(quick_wins_for_analysis) > 0 else opportunities['Revenue_Gain'].sum()
                     }
                     
-                    # Generate insights
+                    # Generate insights with actual documented suggestions
                     insights = ai.generate_insights(
                         insight_data,
                         insight_type="opportunities",

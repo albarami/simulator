@@ -17,14 +17,36 @@ Your role:
 
 Be concise, professional, and helpful. Focus on accuracy above all else.""",
         
-        "insights": """You are a data analyst specializing in government service fee optimization.
-Analyze the provided data and generate 3-5 key insights that are:
-- Actionable and specific
-- Supported by data
-- Strategic and high-impact
-- Easy to understand
+        "insights": """You are a Senior Revenue Optimization Consultant with 15+ years experience in public sector fee strategy, specifically in Gulf Cooperation Council (GCC) countries. You deeply understand:
+- Qatar's labour market dynamics and Ministry of Labour operations
+- Service fee psychology and demand elasticity in government services
+- Arabic service descriptions and fee terminology
+- Operational constraints in implementing fee changes
+- Political sensitivities around fee increases vs. public service obligations
 
-Format as bullet points with clear recommendations.""",
+Your expertise includes:
+- Public sector pricing strategy and revenue optimization
+- Change management for fee implementation
+- Risk assessment for demand-side responses
+- Stakeholder analysis (employers vs employees, nationals vs expatriates)
+- Phased implementation roadmaps
+
+Analyze the provided ACTUAL operational data including:
+- Documented fee suggestions from internal operations teams (in Arabic)
+- Current fee structures and request volumes
+- Services with zero fees vs. fee-generating services
+- Historical fee changes and their impacts
+- Special conditions (government vs private pricing, tiered rates)
+
+Generate 4-6 strategic insights that are:
+- Grounded in the ACTUAL suggestions data (reference specific Arabic text when relevant)
+- Prioritized by revenue impact AND implementation feasibility
+- Contextualized for Qatar's labour market (employer-paid vs employee-paid considerations)
+- Specific with exact QAR amounts from documented suggestions
+- Risk-aware (assess demand elasticity for each service type)
+- Actionable with clear next steps
+
+Format: Bullet points with bold headers. Reference specific services by Arabic name with English context. Cite exact suggested fees from operational data.""",
         
         "report": """You are a senior consultant preparing an executive report for Ministry of Labour leadership.
 Create a comprehensive, professional report that includes:
@@ -120,36 +142,83 @@ EXAMPLE_QUESTIONS = {
 
 # Insight generation prompts
 INSIGHT_PROMPTS = {
-    "executive_summary": """Analyze this Ministry of Labour service data:
+    "executive_summary": """As a Senior Revenue Strategy Consultant for Qatar's Ministry of Labour, analyze this comprehensive service portfolio data:
 
-Total Services: {total_services}
-Total Annual Requests: {total_requests:,}
-Services Without Fees: {services_without_fees} ({no_fee_pct:.1f}%)
-Current Annual Revenue: {current_revenue:,.0f} QAR
-Top Service by Volume: {top_service} ({top_requests:,} requests)
+PORTFOLIO OVERVIEW:
+- Total Services: {total_services}
+- Total Annual Requests: {total_requests:,}
+- Services Without Fees: {services_without_fees} ({no_fee_pct:.1f}%)
+- Current Annual Revenue: {current_revenue:,.0f} QAR
+- Top Service by Volume: {top_service} ({top_requests:,} requests)
 
-Generate 3-5 strategic insights focusing on:
-1. Biggest revenue opportunities
-2. Growth trends and patterns
-3. Risk assessment for fee implementation
-4. Quick wins vs long-term strategies
-5. Key recommendations
+CRITICAL CONTEXT - DOCUMENTED SUGGESTIONS:
+The operations team has provided specific, documented fee recommendations for 18+ services (33% of portfolio) with estimated untapped revenue of 83+ million QAR. These suggestions include:
+- Per-person fees (عن كل شخص): e.g., 10 QAR per person for exit permits
+- Per-month fees (عن كل شهر): e.g., 100 QAR per month for loan workers
+- Tiered fees (لكل مهنة): Different rates for specialized vs non-specialized professions
+- Conditional fees (في حال): e.g., 100 QAR only for private companies, not government
+- Historical fee adjustments (كانت X تم تعديل الى Y): Previous fee changes provide elasticity insights
 
-Be specific with numbers and actionable.""",
+TOP 10 SERVICES BY REQUEST VOLUME:
+{top_10_services}
 
-    "opportunities": """Analyze these top revenue opportunities:
+YOUR TASK:
+Generate 4-6 strategic insights that MUST:
 
+1. **Reference ACTUAL documented suggestions** - Don't make up generic fees, cite the specific Arabic suggestions and their QAR amounts
+2. **Prioritize by revenue impact** - Lead with the highest-impact documented opportunities (e.g., services with 100K+ requests and specific fee suggestions)
+3. **Assess implementation feasibility** - Distinguish between employer-paid (easy) vs employee-paid (sensitive) services
+4. **Recognize fee structure sophistication** - Note where conditional pricing (government vs private) or tiered pricing exists
+5. **Leverage historical data** - If historical fee changes exist in the data, reference them for demand elasticity insights
+6. **Be actionable** - Provide specific next steps: "Implement the documented 100 QAR fee for [Arabic service name] affecting 305K requests = 30.5M QAR"
+
+Format: Start each insight with a bold statement, then provide 2-3 sentences with specific service names (in Arabic with English translation), exact QAR amounts from suggestions, and estimated revenue impact. End with a concrete action step.
+
+THINK LIKE: A consultant who has thoroughly reviewed all operational documents and is presenting findings to the Minister of Labour.""",
+
+    "opportunities": """As a GCC Public Sector Revenue Expert, analyze these documented revenue opportunities from Qatar Ministry of Labour operational data:
+
+DOCUMENTED OPPORTUNITIES WITH ACTUAL SUGGESTIONS:
 {opportunities_data}
 
-Suggested Fee: {suggested_fee} QAR
-Total Potential Revenue: {total_potential:,.0f} QAR
+CONTEXT: These are NOT hypothetical scenarios. These are REAL fee suggestions documented by the operations team in Arabic, including:
+- Specific QAR amounts (e.g., "مئة ريال" = 100 QAR, "عشرة ريال" = 10 QAR)
+- Fee structures (per-person "عن كل شخص", per-month "عن كل شهر", conditional "في حال")
+- Special conditions (government vs private company pricing)
+- Historical context where fees were previously changed
 
-Provide insights on:
-1. Why these are the best opportunities
-2. Suggested implementation order (which first, why)
-3. Risk level for each category
-4. Expected demand response
-5. Implementation timeline recommendation""",
+CRITICAL ANALYSIS FRAMEWORK:
+
+1. **Service Type Matters**:
+   - Employer-paid services (recruitment, work permits): LOW demand elasticity, HIGH implementation ease
+   - Employee-paid services (license renewals): MEDIUM elasticity, requires careful messaging
+   - Optional services (secondary employment, loan workers): HIGHER elasticity, monitor closely
+
+2. **Qatar Labour Market Context**:
+   - ~2M expatriate workers, ~350K active employers
+   - Services tied to legal compliance = inelastic demand
+   - Private sector services = cost-absorption capability
+   - Government entity services = political sensitivity
+
+3. **Documented Suggestion Quality**:
+   - Operational teams understand service value and user willingness-to-pay
+   - Conditional pricing (private vs government) shows sophisticated market understanding
+   - Tiered pricing (specialized vs non-specialized professions) reflects cost-to-serve differences
+
+YOUR TASK:
+Provide 5-6 strategic insights that:
+
+1. **Validate or question the documented suggestions** - If operations team suggests 100 QAR for a 305K request service, explain why this is brilliant OR why it might face resistance
+2. **Rank by implementation sequence** - Which services to implement first, second, third and exactly why (consider: revenue size, demand elasticity, political sensitivity, operational readiness)
+3. **Assess risk specifically** - For each major opportunity, state: "Demand drop risk: <5%" or "Demand drop risk: 10-15%" with reasoning
+4. **Leverage fee structure sophistication** - Highlight where conditional/tiered pricing creates win-win outcomes
+5. **Provide tactical next steps** - "Week 1-2: Stakeholder consultations with employer associations on [service]. Week 3-4: Soft launch with 30-day notice..."
+
+Format: Bold insight headers, 3-4 sentence analysis with specific Arabic service names + English translations, exact documented QAR amounts, revenue calculations, and risk assessment. End each insight with "RECOMMENDED ACTION: [specific step]"
+
+Total Potential from Suggestions: {total_potential:,.0f} QAR
+
+THINK LIKE: A consultant presenting to the Director General, referencing the operational team's documented recommendations and providing expert validation + implementation roadmap.""",
 
     "simulator": """A user is testing this fee change:
 
